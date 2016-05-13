@@ -1,0 +1,2690 @@
+{|class="wikitable mw-collapsible" style="float:right; font-size:0.8em;"
+! Defines 
+|- 
+| <pre style="padding:4px;">
+CODE_GOES_HERE
+</pre>
+|}
+
+
+<div style="clear:both"></div>
+
+==========================================================================
+
+__NOTOC__
+Below is a list of the '''script sections''' which contain all the code for Pokémon Essentials. Each section gives a brief description of its purpose and lists the major methods and variables defined in each section. If there is a main article pertaining to the scripts purpose, it will be linked.
+
+== Settings ==
+This section is a collection of constants that define various things the user can easily turn on and off. The options available are some of the most common things users would want to change. They include switches and constants for:
+* Screen size
+* Pokemon level cap, egg level, shiny and pokerus chances
+* Overworld Mechanics: poison, fishing, diving, berries
+* Infinite TMs
+* Day/Night Shading
+* Signposts (the route name that appears on-screen)
+* Battle Mechanics: physical/special split, Gen 6 battle and EXP mechanics, scaled EXP, critical capture
+* Badge boosts, Badge requirements for HM use.
+* Bag pocket names, size limits, and sorting. (<code>pbPocketNames</code>)
+* Storage system size, and creator name (<code>pbStorageCreator</code>)
+* Pokedex mechanics (<code>pbDexNames</code>)
+* Money limits
+* Rival names in battle
+* Roaming pokemon settings
+* Poké Radar settings
+* Region map extras
+* Contest settings
+* Assigning global switches, common events, and animations to Essentials mechanics.
+* Languages for internationalization.
+* Whether to allow the user to use the keyboard instead of the on-screen keyboard to enter text.
+
+
+<div style="clear:both"></div>
+== RGSS2Compatibility ==
+These scripts support the use of RGSS2 players in Pokémon Essentials. Note that this is not the same as Essentials being compatible with RPG Maker VX - only the RGSS2 ''player'' is compatible.
+
+
+<div style="clear:both"></div>
+== RPG__Sprite ==
+{|class="wikitable mw-collapsible" style="float:right; font-size:0.8em;"
+! Defines 
+|- 
+| <pre style="padding:4px;">
+SpriteAnimation
+</pre>
+|}
+This section contains the basic definition of what a sprite is. Practically everything visual in the game depends on this.
+
+
+<div style="clear:both"></div>
+== Win32API ==
+This section connects the game with Window's API, which allows it to do things like reposition the main window and set the window title. 
+
+
+<div style="clear:both"></div>
+== Sockets ==
+{|class="wikitable mw-collapsible" style="float:right; font-size:0.8em;"
+! Defines 
+|- 
+| <pre style="padding:4px;">
+pbPostData
+pbDownloadData
+pbHttpRequest
+pbDownloadToString
+pbDownloadToFile
+pbPostToString
+pbPostToFile
+</pre>
+|}
+{{main|Internet}}
+This section handles how the game can connect to the Internet and retrieve information. This is used by Essentials' [[Mystery Gift]] function.
+
+
+<div style="clear:both"></div>
+== DebugConsole ==
+{|class="wikitable mw-collapsible" style="float:right; font-size:0.8em;"
+! Defines 
+|- 
+| <pre style="padding:4px;">
+Console::setup_console
+Console::readInput
+Console::readInput2
+Console::get_input
+Kernel.echo
+Kernel.echoln
+</pre>
+|}
+This section defines the debug console built into Essentials. To use the console, open up the debug menu in-game (F9) and select the "Open Debug Console" option at the bottom of the list. This console cannot be typed into (usually), but it will output logging information. To log to the console, use <code>Kernel.echo(string)</code> or <code>Kernel.echoln(string)</code>.
+
+
+<div style="clear:both"></div>
+== Game_Temp ==
+This section defines <code>Game_Temp</code>, which handles all temporary data. This data is NOT saved in a [[Saving and loading|save game]]. Use <code>$game_temp</code> to access the global instance of this class. Most all of the data kept in this class is used by Essentials internally; chances are slim that you'll need to touch this data.
+
+<div style="clear:both"></div>
+== Game_System ==
+{|class="wikitable mw-collapsible" style="float:right; font-size:0.8em;"
+! Defines 
+|- 
+| <pre style="padding:4px;">
+$game_system.timer
+$game_system.save_disabled
+$game_system.menu_disabled
+$game_system.encounter_disabled
+$game_system.save_count
+$game_system.bgm_play(bgm)
+$game_system.bgm_memorize
+$game_system.bgm_restore
+$game_system.me_play(me)
+$game_system.bgs_play(bgs)
+$game_system.bgs_stop
+$game_system.bgs_fade(time)
+$game_system.se_play(se)
+</pre>
+|}
+This section defines <code>Game_System</code>, which handles various system data which is saved in the save file. Use <code>$game_system</code> to access the global instance of this class. There are functions which play music and sound effects in this class.
+
+
+<div style="clear:both"></div>
+== Game_Switches ==
+{{main|Events#Global_Switches}}
+This section defines <code>Game_Switches</code>, which handles the game's Global Switches. Use <code>$game_switches</code> to access the global instance of this class. You cannot have more than 5000 switches.
+
+Note: [[Events#Script_Switches|Script Switches]] do not have the results of their scripts stored in them. For example, <code>$game_switches[15]</code> (switch 15, defined as "s:PBDayNight.isNight?(pbGetTimeNow)") will always contain <code>false</code> regardless of the time of day.
+
+
+<div style="clear:both"></div>
+== Game_Variables ==
+{{main|Events}}
+This section defines <code>Game_Variables</code>, which handles the game's Global Variables. Use <code>$game_variables</code> to access the global instance of this class. You cannot have more than 5000 variables.
+
+
+<div style="clear:both"></div>
+== Game_SelfSwitches ==
+{{main|Events}}
+This section defines <code>Game_SelfSwitches</code>, which handles the game's event Self Switches. Use <code>$game_self_switches</code> to access the global instance of this class. Keys into this hashmap are an array, of the form <code>[mapid, eventid, switchname]</code>.
+
+You should use the function <code>pbSetSelfSwitch(eventid,switch,value)</code> to set self-switches of other events on the current map. 
+
+
+<div style="clear:both"></div>
+== Game_Screen ==
+{|class="wikitable mw-collapsible" style="float:right; font-size:0.8em;"
+! Defines 
+|- 
+| <pre style="padding:4px;">
+$game_screen.start_tone_change
+$game_screen.start_flash
+$game_screen.start_shake
+$game_screen.weather
+</pre>
+|}
+This section defines <code>Game_Screen</code>, which handles visual effects such as changing the colour tone of the screen or flashing. Use <code>$game_screen</code> to access the global instance of this class.
+
+
+<div style="clear:both"></div>
+== Game_Picture ==
+This section defines <code>Game_Picture</code>, which handles displaying pictures. Instances of this class are used in Game_Screen.
+
+
+<div style="clear:both"></div>
+== Game_Map ==
+{|class="wikitable mw-collapsible" style="float:right; font-size:0.8em;"
+! Defines 
+|- 
+| <pre style="padding:4px;">
+$game_map.name
+$game_map.map_id
+</pre>
+|}
+This section defines <code>Game_Map</code>, which contains the basic definition of a [[Maps|game map]]. Use <code>$game_map</code> to access the current map's instance.
+
+
+<div style="clear:both"></div>
+== Game_Map_Resolution ==
+This section extends <code>Game_Map</code> to allow Essentials to scale up the game, and includes display corrections for when the map is set to snap to edges (i.e. the screen stops scrolling).
+
+
+<div style="clear:both"></div>
+== Game_Map_Autoscroll ==
+{|class="wikitable mw-collapsible" style="float:right; font-size:0.8em;"
+! Defines 
+|- 
+| <pre style="padding:4px;">
+autoscroll(x,y,speed)
+autoscroll_player(speed)
+</pre>
+|}
+This section extends <code>Game_Map</code> to allow easier map scrolling for cutscenes. The functions listed to the right are defined in the Interpreter, and thus will work unadorned from event scripts.
+
+This section handles additional map scrolling features. These additional features include:
+
+* Scrolling to a given map location or to the player.
+* Following a moving character.
+* Setting the speed at which the scrolling occurs.
+* Scrolling diagonally.
+
+The supported commands are as follows:
+
+{| border="1" cellpadding="2" width="80%" align="center"
+| align="center" | <code>autoscroll(x,y)</code>
+| Scrolls to the given coordinates (at a default speed of 4). Diagonal scrolling occurs automatically. The coordinates can be variables as well as numbers (e.g. setting the variables to equal the coordinates of an NPC means the screen will follow that NPC).
+|-
+| align="center" | <code>autoscroll(x,y,speed)</code>
+| As above, but you can also define the scroll speed (between 1 and 6).
+|-
+| align="center" | <code>autoscroll_player(speed)</code>
+| Scrolls to (and follows) the player at the given speed (between 1 and 6).
+|}
+
+The above commands must be on a single line in an event's "Script" command, and must be the first line in that command.
+
+
+<div style="clear:both"></div>
+== Game_CommonEvent ==
+This section defines <code>Game_CommonEvent</code>, which handles common events. Common events are those listed in the Database.
+
+
+<div style="clear:both"></div>
+== Game_Character ==
+{|class="wikitable mw-collapsible" style="float:right; font-size:0.8em;"
+! Defines 
+|- 
+| <pre style="padding:4px;">
+Game_Character
+  .moving?
+  .jumping?
+  .moveto(x,y)
+  .move_{direction}
+  .turn_{direction}
+  .move_towards_player
+  .move_away_from_player
+  .jump(x_plus,y_plus)
+</pre>
+|}
+This section defines <code>Game_Character</code>, which handles various aspects of game events, including basic definition, forced move routes, centring the screen on the player, and bushes.
+
+
+<div style="clear:both"></div>
+== Game_Event ==
+{|class="wikitable mw-collapsible" style="float:right; font-size:0.8em;"
+! Defines 
+|- 
+| <pre style="padding:4px;">
+Game_Event
+  .map_id
+  .name
+  .id
+  .tsOn?(c)
+  .tsOff?(c)
+  .setTempSwitch{On|Off}(c)
+  .switchIsOn?(id)
+</pre>
+|}
+This section defines <code>Game_Event</code>, a subclass of <code>Game_Character</code>, which handles the basic details of [[events]]. 
+
+This class defines a concept of "TempSwitches", which are switches which are kept in the instance of the Game_Event only, and not saved off even between map changes. Thus Temporary switches are reset when the player leaves the map and comes back. Doors in the Essentials example project use temporary switches to play the animation of the player leaving a house once and only once upon map load. (Hint: If you're having trouble making the exit animation on doors play when you're moving a player between rooms on the same map, set the temporary switches of the doors on the map back off as part of the transition.)
+
+The <code>.switchIsOn?(id)</code> function defined in this class is responsible for executing Script Switches and returning the result to the event's condition evaluation process.
+
+
+<div style="clear:both"></div>
+== Game_Player ==
+{|class="wikitable mw-collapsible" style="float:right; font-size:0.8em;"
+! Defines 
+|- 
+| <pre style="padding:4px;">
+$game_player.move_{direction}
+$game_player.pbHasDependentEvents?
+$game_player.pbTriggeredTrainerEvents
+$game_player.pbTriggeredCounterEvents
+$game_player.center(x,y)
+</pre>
+|}
+This section defines <code>Game_Player</code>, a subclass of <code>Game_Character</code>, which handles the player character, including movement, checking whether a trainer can spot the player from a distance, tile passabilities, map scrolling and interacting with events. Use <code>$game_player</code> to access the global instance of this class.
+
+The function <code>pbTriggeredTrainerEvents</code> checks all events named "Trainer(##)" on the current map to see if they can reach the player. The function <code>pbTriggeredCounterEvents</code> checks all events named "Counter(##)" on the current map to see if they are facing the player. Both methods return all events that pass their respective checks in an array.
+
+
+
+<div style="clear:both"></div>
+== Walk_Run ==
+{|class="wikitable mw-collapsible" style="float:right; font-size:0.8em;"
+! Defines 
+|- 
+| <pre style="padding:4px;">
+$game_player.pbCanRun?
+$game_player.pbIsRunning?
+</pre>
+|}
+{{main|Getting around}}
+This section extends <code>Game_Player</code> to how the player [[Getting around|runs and cycles]], including defining where these can be done and how quickly the player moves when they do so. It also defines the player's walking speed.
+
+
+<div style="clear:both"></div>
+== Sprite_Character ==
+This section defines <code>BushBitmap</code> and <code>Sprite_Character</code>. They handle how bush tiles are displayed, and the display of an event's sprite.
+
+
+<div style="clear:both"></div>
+== Sprite_Picture ==
+This section defines <code>Sprite_Picture</code>, which handles the display of sprite pictures (stored in "Graphics/Pictures/").
+
+
+<div style="clear:both"></div>
+== Sprite_Timer ==
+This section defines <code>Sprite_Timer</code>, which handles showing a window displaying a timer, usually one that counts down to 0.
+
+
+<div style="clear:both"></div>
+== Sprite_Resizer ==
+{|class="wikitable mw-collapsible" style="float:right; font-size:0.8em;"
+! Defines 
+|- 
+| <pre style="padding:4px;">
+pbSetResizeFactor
+pbConfigureFullScreen
+</pre>
+|}
+This section extends several classes which allow the game to zoom the game to a 0.5, 1.5, and 2.0 times the size of normal.
+
+
+<div style="clear:both"></div>
+== Spriteset_Map ==
+This section defines <code>ReflectedSprite</code> and <code>ClippableSprite</code>, which handle reflecting sprites in still water ([[Tilesets|terrain tag 6]] tiles). It also defines <code>Spriteset_Map</code>, which handles displaying maps.
+
+
+<div style="clear:both"></div>
+== Tilemap_XP ==
+This section defines <code>CustomTilemap</code>, as well as several supporting classes, which reimplement XP's Tilemap class with functionality for scaling and specialized autotiles. (?)
+
+
+<div style="clear:both"></div>
+== Tilemap_Perspective ==
+{|class="wikitable mw-collapsible" style="float:right; font-size:0.8em;"
+! Defines 
+|- 
+| <pre style="padding:4px;">
+ScreenPosHelper::pbScreenZoom{X|Y}
+ScreenPosHelper::pbScreen{X|Y|Z}
+ScreenPosHelper::bmHeight
+bltMinimapAutotile
+getPassabilityMinimap
+</pre>
+|}
+{{main|Perspective mode}}
+This section defines <code>Draw_Tilemap</code> along with a few helper methods, which deal with showing maps in perspective mode
+
+
+
+<div style="clear:both"></div>
+== TilemapLoader ==
+This section defines <code>TilemapLoader</code>, which is a proxy class for the various kinds of TileMap classes defined in previous sections. 
+
+
+<div style="clear:both"></div>
+== TileDrawingHelper ==
+This section defines <code>TileDrawingHelper</code>, which handles how autotile graphics are arranged, and how to draw them and regular tiles.
+
+
+<div style="clear:both"></div>
+== AnimationSprite ==
+{|class="wikitable mw-collapsible" style="float:right; font-size:0.8em;"
+! Defines 
+|- 
+| <pre style="padding:4px;">
+Spriteset_Map
+  .addUserSprite
+  .addUserAnimation
+</pre>
+|}
+This section defines <code>AnimationSprite</code>, which is used to display one-off animations on the map (like grass rustling). This section extends Spriteset_Map to use AnimationSprite.
+
+
+<div style="clear:both"></div>
+== ParticleEngine ==
+{{main|Particle effects}}
+This section defines <code>Particle_Engine</code> and helper classes, which handle the display of particle effects, such as those on Route 3 in the Essentials example project. It defines the effects "fire", "smoke", "teleport", "spirit", "explosion", "aura", "soot", "sootsmoke", "rocket", "fixteleport", "smokescreen", "flare", "splash", and "starteleport". This section extends the Game_Event class to support these particle effects.
+
+
+<div style="clear:both"></div>
+== DynamicShadows ==
+This section defines <code>Sprite_Shadow</code>, which displays the dynamic sprite shadows created when walking near a shadow source (as seen on Cycling Road in the Essentials example project). This section extends Sprite_Character, Game_Event, and Spriteset_Map to support this.
+
+
+<div style="clear:both"></div>
+== Interpreter ==
+{|class="wikitable mw-collapsible" style="float:right; font-size:0.8em;"
+! Defines 
+|- 
+| <pre style="padding:4px;">
+pbExecuteScript
+get_character
+</pre>
+|}
+This section defines <code>Interpreter</code>, which handles the running of game events. This class defines how the game runs every command you can put in an event. See the <code>execute_command</code> function to find which <code>command_###</code> function applies to which event command.
+
+
+<div style="clear:both"></div>
+== Event ==
+{|class="wikitable mw-collapsible" style="float:right; font-size:0.8em;"
+! Defines 
+|- 
+| <pre style="padding:4px;">
+Event
+  .trigger
+  +=proc
+  -=proc
+</pre>
+|}
+This section defines <code>Event</code>, which is an event listener structure (and not related to RMXP events). Given an instance of the Event class <code>evt</code>, you can register a callback to be run by using:
+
+  evt+=proc {|sender,params|
+    # Your code here
+  }
+
+Procedures can be deregistered by using <code>-=</code>, and the callback list can be triggered using the <code>trigger(args)</code> and <code>trigger2(args)</code> methods. This is used by item effects, encounter generation, player step reactions, etc.
+
+The class <code>HandlerHash</code> is also defined in this section.
+
+
+<div style="clear:both"></div>
+== File_Mixins ==
+{|class="wikitable mw-collapsible" style="float:right; font-size:0.8em;"
+! Defines 
+|- 
+| <pre style="padding:4px;">
+FileInputMixin
+FileOutputMixin
+File
+StringInput
+StringOutput
+</pre>
+|}
+This section defines several functions for file IO.
+
+
+<div style="clear:both"></div>
+== Intl_Messages ==
+{|class="wikitable mw-collapsible" style="float:right; font-size:0.8em;"
+! Defines 
+|- 
+| <pre style="padding:4px;">
+pbAddScriptTexts
+pbAddRgssScriptTexts
+pbSetTextMessages
+pbGetText
+pbCompileText
+pbLoadMessages
+_INTL(*arg)
+_ISPRINTF(*arg)
+_I(str)
+_MAPINTL(mapid,*arg)
+_MAPISPRINTF(mapid,*arg)
+</pre>
+|}
+This section defines <code>Messages</code>, <code>MessageTypes</code>, <code>OrderedHash</code>, and several functions for internationalization.
+
+
+<div style="clear:both"></div>
+== PBDebug ==
+This section defines <code>PBDebug</code>, which handles logging to files.
+
+
+<div style="clear:both"></div>
+== Audio ==
+{|class="wikitable mw-collapsible" style="float:right; font-size:0.8em;"
+! Defines 
+|- 
+| <pre style="padding:4px;">
+safeExists?(f)
+Audio.bgm_play
+Audio.bgm_fade
+Audio.bgm_stop
+Audio.me_play
+Audio.me_fade
+Audio.me_stop
+Audio.bgs_play
+Audio.bgs_fade
+Audio.bgs_stop
+</pre>
+|}
+This section defines the <code>Audio</code> module, which handles the playing of audio files.
+
+
+<div style="clear:both"></div>
+== AudioPlay ==
+{|class="wikitable mw-collapsible" style="float:right; font-size:0.8em;"
+! Defines 
+|- 
+| <pre style="padding:4px;">
+pbBGMPlay(param)
+pbBGMFade
+pbBGMStop
+pbMEPlay(param)
+pbMEFade
+pbMEStop
+pbBGSPlay(param)
+pbBGSFade
+pbBGSStop
+pbSEPlay(param)
+pbSEFade
+pbSEStop
+pbPlayCursorSE
+pbPlayDecisionSE
+pbPlayCancelSE
+pbPlayBuzzerSE
+</pre>
+|}
+This section defines several global functions for playing audio. These functions are likely what you want to use if you want to play audio from a script.
+
+
+<div style="clear:both"></div>
+== AudioUtilities ==
+{|class="wikitable mw-collapsible" style="float:right; font-size:0.8em;"
+! Defines 
+|- 
+| <pre style="padding:4px;">
+Audio.noise
+Audio.envelopeDuration
+Audio.oscillateDouble
+Audio.oscillate
+Audio.frac
+Audio.sine
+Audio.doubleSine
+Audio.noise2
+Audio.square
+Audio.dtmf
+Audio.beep
+Audio.triangle
+Audio.triangle2
+Audio.playTone
+Audio.saw
+ringtone(duration)
+backspace
+callwaiting
+callheld
+loudFastBusy
+tone{CountyCode}
+beginRecord
+getRecorderSample
+stopRecord
+endRecord
+</pre>
+|}
+This section extends the <code>Audio</code> module to include ways to generate sounds and notes on the fly. Helper methods include ways to create tones you would hear on a phone. It also defines functions for recording audio and saving it off, used in Essentials' implementation of the Chatter move.
+
+
+<div style="clear:both"></div>
+== BitmapCache ==
+{|class="wikitable mw-collapsible" style="float:right; font-size:0.8em;"
+! Defines 
+|- 
+| <pre style="padding:4px;">
+WeakRef
+WeakHashtable
+Cache
+BitmapWrapper
+BitmapCache.load_bitmap
+</pre>
+|}
+This section defines the <code>BitmapCache</code> module, which handles caching loaded image files.
+
+
+<div style="clear:both"></div>
+== Window ==
+This section defines the <code>Window</code> class, which is the base class for text windows, command lists, etc. The code to draw the windows from a small bitmap is defined in this section.
+
+
+<div style="clear:both"></div>
+== SpriteWindow ==
+{|class="wikitable mw-collapsible" style="float:right; font-size:0.8em;"
+! Defines 
+|- 
+| <pre style="padding:4px;">
+MessageConfig
+GifLibrary
+AnimatedBitmap
+SpriteWrapper
+AnimatedSprite
+IconSprite
+ColoredPlane
+AnimatedPlane
+SpriteWindowCursorRect
+SpriteWindow
+SpriteWindow_Base
+SpriteWindow_Selectable
+SpriteWindow_SelectableEx
+Window_DrawableCommand
+Window_CommandPokemon
+Window_AdvancedCommandPokemon
+Window_UnformattedTextPokemon
+Window_AdvancedTextPokemon
+Window_InputNumberPokemon
+Window_CommandPokemonEx
+Window_AdvancedCommandPokemonEx
+IconWindow
+PictureWindow
+pbGetTileBitmap
+pbGetAnimation
+pbGetTileset
+pbGetAutotile
+pbFadeOutIn
+pbFadeOutAndHide
+pbFadeInAndShow
+pbResolveBitmap
+addBackgroundPlane
+pbSetSystemFont
+pbRgssExists?
+pbRgssOpen
+</pre>
+|}
+This section defines many classes and methods which Essentials uses to draw its UI windows, and its animated sprites. It also defines a few methods for opening data files.
+* The <code>MessageConfig</code> module defined at the top of the file defines many of the default colors and fonts used by the system.
+* The <code>AnimatedBitmap</code> proxy class is used by much of the library to display almost everything, from pokemon's icons in the party screen, to battlers in battle, to items in the bag, to cards in Triple Triad.
+* The <code>SpriteWindow</code> class is the base for every window used by Essentials' UI. It has many subclasses that serve many different purposes.
+* The <code>pbFadeOutIn</code> method is used in several places to fade out to a new submenu, such as when you go into the party screen from the pause menu.
+
+
+
+<div style="clear:both"></div>
+== DrawText ==
+{|class="wikitable mw-collapsible" style="float:right; font-size:0.8em;"
+! Defines 
+|- 
+| <pre style="padding:4px;">
+getLineBrokenChunks
+renderLineBrokenChunks
+renderLineBrokenChunksWithShadow
+getFormattedText
+drawBitmapBuffer
+</pre>
+|}
+{{main|Messages}}
+This section defines several methods which handle the drawing of text to the screen, as well as the effects of the various message modifiers (colour changes, repositioning, displaying extra things, etc).
+
+
+<div style="clear:both"></div>
+== Messages ==
+{|class="wikitable mw-collapsible" style="float:right; font-size:0.8em;"
+! Defines 
+|- 
+| <pre style="padding:4px;">
+pbMapInterpreterRunning?
+pbMapInterpreter
+pbGlobalLock
+pbGlobalUnlock
+pbChooseNumber
+Kernel.pbMessage
+Kernel.pbMessageChooseNumber
+Kernel.pbConfirmMessage
+Kernel.pbConfirmMessageSerious
+pbPositionFaceWindow
+pbPositionNearMsgWindow
+pbGetMapNameFromId
+Kernel.pbMessageDisplay
+</pre>
+|}
+{{main|Messages}}
+This section defines many of the methods Essentials uses to display messages to the player.
+* <code>Kernel.pbMessage</code> is the most basic message display, and the one you most often will use when displaying a message from a script. It is the method called internally when you use a Text Command in an event.
+* <code>Kernel.pbConfirmMessage</code> and <code>pbConfirmMessageSerious</code> display a Yes/No (or in the case of -Serious, a No/Yes) choice to the player.
+* <code>Kernel.pbMessageChooseNumber</code> will ask the player to enter a number.
+* <code>Kernel.pbMessageDisplay</code> is the eventual call of all of the above. This is where the message you passed has all of its modifiers and text replacements processed.
+
+
+<div style="clear:both"></div>
+== TextEntry ==
+{|class="wikitable mw-collapsible" style="float:right; font-size:0.8em;"
+! Defines 
+|- 
+| <pre style="padding:4px;">
+Window_TextEntry
+Window_MultilineTextEntry
+Window_TextEntry_Keyboard
+PokemonEntryScene
+PokemonEntryScene2
+getLineBrokenText
+Kernel.pbFreeText
+Kernel.pbMessageFreeText
+pbEnterText
+pbEnterPlayerName
+pbEnterPokemonName
+pbEnterBoxName
+pbEnterNPCName
+</pre>
+|}
+This section defines several methods and classes which handle the various text entry methods available in Essentials. 
+
+
+<div style="clear:both"></div>
+== EventScene ==
+{|class="wikitable mw-collapsible" style="float:right; font-size:0.8em;"
+! Defines 
+|- 
+| <pre style="padding:4px;">
+PictureEx
+PictureSprite
+EventScene
+setPictureSprite
+pbEventScreen
+</pre>
+|}
+This section defines the <code>EventScene</code> class, which is the base class for scenes that are not menus and not maps, such as the Intro splash screens, and the screen displaying the controls when starting the game. It also defines <code>pbEventScreen(evtScene)</code>, which displays a subclass of the EventScene.
+
+
+<div style="clear:both"></div>
+== Scene_Map ==
+This section defines the <code>Scene_Map</code> class, which is defines the scenes while the player character is walking around in the overworld. This class is where transferring the player, updating the map, input handling while in the overworld is handled.
+
+
+<div style="clear:both"></div>
+== Scene_Intro ==
+{{main|Game intro}}
+This section defines the <code>IntroEventScene</code> and <code>Scene_Intro</code> classes, which handle the intro and splash screens that appear at the start of a game.
+
+
+<div style="clear:both"></div>
+== Scene_Controls ==
+This section defines the <code>ButtonEventScene</code> class, which handle the display of the controls screen, usually provided at the start of a new game when the professor asks if there is any help he can give.
+
+
+<div style="clear:both"></div>
+== Scene_Movie ==
+This section defines the <code>Scene_Movie</code> class, which handles the playing of AVI movie files in-game. Movies must be in a folder "Movies" in the main game directory. Use the following code to load a movie scene:
+
+ $scene = Scene_Movie.new("MovieName")
+
+When the movie is done or the player presses B, the game will return to the overworld view (the Scene_Map).
+
+
+<div style="clear:both"></div>
+== Scene_Credits ==
+{{main|Credits}}
+This section defines the <code>Scene_Credits</code> class, which handles the display of the credits.
+
+To insert your own credits, edit the lines that say "Credits go here". To play the credits, use the following script:
+
+ $scene = Scene_Credits.new
+
+All graphics used by this script are in the "Graphics/Titles" folder. You can add or change the images used by editing the <code>CreditsBackgroundList</code> at the top of this script section. The credits are displayed with a scrolling effect.
+
+
+<div style="clear:both"></div>
+== Transitions ==
+This section overrides <code>Graphics.transition</code> to define several transition effects that occur just before a battle starts. 
+
+Tip: If you're experiencing issues with the fade effect when using <code>Graphics.transition</code> comment out lines 95 and 96 in this section: 
+
+ elsif dc==""
+   @@transition=FadeTransition.new(duration)
+
+Doing so will revert the fade effect to the stock RMXP fade effect.
+
+
+<div style="clear:both"></div>
+== MiscData ==
+{|class="wikitable mw-collapsible" style="float:right; font-size:0.8em;"
+! Defines 
+|- 
+| <pre style="padding:4px;">
+PhoneDatabase
+PhoneMsgType
+PokemonMetadata
+pbLoadMetadata
+pbGetMetadata
+pbLoadPhoneData
+pbOpenDexData
+pbDexDataOffset
+</pre>
+|}
+{{main|Metadata}}
+This section defines the <code>PokemonMetadata</code> module, which defines the various metadata that Essentials looks for in the metadata.txt PBS file. This section also defines a class for Phone metadata and several methods to get map metadata.
+
+
+<div style="clear:both"></div>
+== PBMove ==
+{{main|Moves}}
+This section defines <code>PBMoveData</code> and <code>PBMove</code> classes, which handles moves, both reading the move data from the data files and defining the properties of a move (e.g. type, PP, etc.).
+
+
+<div style="clear:both"></div>
+== PBStatuses ==
+This section defines the <code>PBStatuses</code> module, which is where permanent (i.e. out of battle) Pokémon statuses are enumerated. This does not include confusion/infatuation/etc. which are all "volatile" in-battle conditions which a Pokémon can have in addition to a permanent status.
+
+The effects of these statuses are not included here. The Pokérus status is also not defined here, as it is an unrelated effect.
+
+
+
+<div style="clear:both"></div>
+== PBTypes_Extra ==
+This section extends the <code>PBTypes</code> class, which handles data regarding elemental types, including their Physical/Special category and type effectiveness calculations.
+
+
+<div style="clear:both"></div>
+== PBNatures ==
+This section defines the <code>PBNatures</code> module, which enumerates the ID numbers and names of Pokémon natures. The effects of natures are not included here.
+
+
+<div style="clear:both"></div>
+== PBExperience ==
+This section defines the <code>PBExperience</code> module, which lists the experience thresholds for each level for each growth type. The thresholds for levels below 100 are listed as individual numbers in an array, whereas those for level 101 and above have formulae for calculating them.
+
+
+<div style="clear:both"></div>
+== PBStats ==
+This section defines the <code>PBStats</code> module, which enumerates the eight stats that all Pokémon have. This includes HP, Attack, Defense, Speed, Special Attack, and Special Defense, as well as the two in-battle stats, Accuracy and Evasion.
+
+
+<div style="clear:both"></div>
+== PBRibbons ==
+This section defines the <code>PBRibbons</code> module, which enumerates the ID numbers, names and descriptions of ribbons.
+
+
+<div style="clear:both"></div>
+== PBEggGroups ==
+This section defines the <code>PBEggGroups</code> module, which enumerates the ID numbers and names of the various egg groups.
+
+
+<div style="clear:both"></div>
+== PBColors ==
+This section defines the <code>PBColors</code> module, which enumerates the IDs and names of the Pokedex color categories.
+
+
+<div style="clear:both"></div>
+== PBEnvironment ==
+This section defines the <code>PBEnvironment</code> module, which enumerates the different environment types. These environment types are used to determine the appropriate [[Backgrounds and music|backdrops]] for battles, as well as some move effects.
+
+
+<div style="clear:both"></div>
+== PBEffects ==
+This section defines the <code>PBEffects</code> module, which enumerates all the variables used for lingering effects of attacks/abilities/items (e.g. Choice Band, Disable, Protect, Flinch, Toxic). Their effects are not included here.
+
+
+<div style="clear:both"></div>
+== PBWeather ==
+This section defines the <code>PBWeather</code> module, which enumerates all the possible in-battle weather types. The effects of in-battle weather are not included here.
+
+
+<div style="clear:both"></div>
+== PBTargets ==
+This section defines the <code>PBTargets</code> module, which enumerates all possible target combinations for a given move.
+
+
+<div style="clear:both"></div>
+== PokeBattle_ActiveSide ==
+This section defines the <code>PokeBattle_ActiveSide</code> and <code>PokeBattle_ActiveField</code> classes, which contain the variables used for lingering move effects that affect all Pokémon on the battle field or just one side of a battle (i.e. the player's side or the opposing side). Their effects are not included here.
+
+
+<div style="clear:both"></div>
+== PokeBattle_DamageState ==
+This section defines the <code>PokeBattle_DamageState</code> class, which is used in the PokeBattler_Battler class (see below) to keep track of several different flags used in battle for damage calculation, including the last amount of hp lost, whether the last hit was a critical, whether a substitute too the damage, etc.
+
+
+<div style="clear:both"></div>
+== PokeBattle_Battler ==
+{|class="wikitable mw-collapsible" style="float:right; font-size:0.8em;"
+! Defines 
+|- 
+| <pre style="padding:4px;">
+PokeBattle_Battler
+  .battle
+  .pokemon
+  .hasMega?
+  .isMega?
+  .pbThis
+  .pbHasMove?
+  .hasWorkingAbility
+  .hasWorkingItem
+  .pbReduceHP
+  .pbRecoverHP
+  .pbFaint
+  .pbObedienceCheck?
+  .pbTryUseMove
+  .pbUseMove
+</pre>
+|}
+This section defines the <code>PokeBattle_Battler</code> class. 
+
+A battler is a separate entity to a Pokémon. This allows the battler to be changed in dramatic ways (e.g. using Transform) without affecting the Pokémon it is based on.
+
+This section defines all the in-battle properties a battler has. This includes species, level, moves, stats, etc. (copied from the Pokémon), as well as things like whether it is fainted, what its last used move was, the stat modifier stages, and which other battlers will gain experience from it when it is defeated.
+
+It also contains various functions that affect individual battlers, including one that faints the battler, one that determines the battler's modified speed, ones that affect status, one that describes what happens when a held item is consumed, ones that modify attack targets based on various effects, one that determines whether the battler will obey the trainer (and what happens if they don't), and ones that describe how a move is used.
+
+It also contains methods that describe form-changing during battle.
+
+
+<div style="clear:both"></div>
+== PokeBattle_BattlerEffects ==
+{|class="wikitable mw-collapsible" style="float:right; font-size:0.8em;"
+! Defines 
+|- 
+| <pre style="padding:4px;">
+PokeBattle_Battler
+  .pbSleep
+  .pbPoison
+  .pbBurn
+  .pbParalyze
+  .pbFreeze
+  .pbConfuse
+  .pbAttract
+  .pbFlinch
+  .pbIncreaseStat
+  .pbReduceStat
+</pre>
+|}
+This section extends the <code>PokeBattle_Battler</code> class to handle various in-battle effects, such as whether a battler can be given a particular status (also checks immunities to that status), inflicting statuses, status effects, and stat stage modifications.
+
+
+<div style="clear:both"></div>
+== PokeBattle_Move ==
+{|class="wikitable mw-collapsible" style="float:right; font-size:0.8em;"
+! Defines 
+|- 
+| <pre style="padding:4px;">
+PokeBattle_Move
+  .battle
+  .pp
+  .totalpp
+  .pbType
+  .pbIsPhysical?
+  .pbTargetsMultiple?
+  .canThawUser?
+  .ignoresSubstitute?
+  .pbTypeModifier
+  .pbIsCritical?
+  .pbCalcDamage
+  .pbEffect
+</pre>
+|}
+{{main|Moves}}
+This section defines the <code>PokeBattle_Move</code> class, which is the base class for all move classes. It handles moves in battle, including effectiveness calculations, accuracy check, power modifications, critical hit chance and damage calculation.
+
+
+<div style="clear:both"></div>
+== PokeBattle_MoveEffects ==
+{{main|Function codes}}
+This section defines hundreds of subclasses of <code>PokeBattle_Move</code>, one for each move. Usually each of these subclasses override the <code>pbEffect</code> method to implement the how the given move works and animates in battle. 
+
+Notably implemented first in the section are:
+* <code>PokeBattle_UnimplementedMove</code> - a error handler move class for moves which are defined in the PBS file but don't have a subclass defined for them. Damaging moves do damage and nothing else, while status moves always fail.
+* <code>PokeBattle_FailedMove</code> - A superclass for moves that always fail.
+* <code>PokeBattle_Confusion</code> - A class which implements the pseudo-move used by a battler against itself when it hurts itself in confusion.
+* <code>PokeBattle_Struggle</code> - An implementation for Struggle, should the move not be defined in the PBS file.
+
+
+<div style="clear:both"></div>
+== PokeBattle_Battle ==
+{|class="wikitable mw-collapsible" style="float:right; font-size:0.8em;"
+! Defines 
+|- 
+| <pre style="padding:4px;">
+PokeBattle_NullBattlePeer
+PokeBattle_BattlePeer
+PokeBattle_SuccessState
+PokeBattle_BattleCommon
+PokeBattle_Battle
+  .pbIsUnlosableItem
+  .pbPlayer
+  .pbGetMegaRingName
+  .pbMegaEvolve
+  .pbFindNextUnfainted
+  .pbAddToPlayerParty
+  .pbCanChooseMove?
+  .pbCanSwitch?
+  .pbSendOut
+  .pbGainExpOne
+  .pbRun
+  .pbLearnMove
+  .pbJudge
+  .pbDisplay
+  .pbStartBattle
+  .pbCommandPhase
+  .pbAttackPhase
+  .pbEndOfRoundPhase
+  .pbEndOfBattle
+</pre>
+|}
+{{main|Battles}}
+This section defines the <code>PokeBattle_Battle<code> class, which handles the main battle process, from starting the battle through processing the phases (command, attack and end-of-round) to [[Ending a battle|calculating the result]] and awarding Exp/money.
+
+Two methods defined in <code>PokeBattle_Battle<code>, <code>pbRandom</code> and <code>pbAIRandom</code>, are called whenever the battle needs a random number to use. By default, they simply call Ruby's <code>rand()</code> method, but they can be easily overridden to use another random number generator, if desired.
+
+The method <code>pbJudge</code> is called after every step of battle where a pokemon can get damaged. It determines which side of the battle won, if any side has won yet.
+
+The method <code>pbGainExpOne</code> has code to celebrate a level up, and the method <code>pbLearnMove</code> is called to ask the player which move will be forgotten for a new move learned.
+
+
+<div style="clear:both"></div>
+== PokeBattle_AI ==
+{|class="wikitable mw-collapsible" style="float:right; font-size:0.8em;"
+! Defines 
+|- 
+| <pre style="padding:4px;">
+PBTrainerAI.minimumSkill=1
+PBTrainerAI.mediumSkill=32
+PBTrainerAI.highSkill=48
+PBTrainerAI.bestSkill=100
+PokeBattle_Battle
+  .pbGetMoveScore
+  .pbRoughDamage
+  .pbChooseMoves
+  .pbEnemyShouldUseItem?
+  .pbEnemyShouldWithdraw?
+</pre>
+|}
+{{main|Battle AI}}
+This section extends the <code>PokeBattle_Battle</code> class to add several methods for the AI to use in determining what enemy [[trainers]] should do in battle. The <code>pbGetMoveScore</code> consists of a gigantic case statement with function codes for every move, and individually weights the viability of the given move.
+
+This section also defines <code>PBTrainerAI</code>, which enumerates the thresholds for AI skill levels (given for a trainer class in the trainertypes.txt file). 0 is defined as a wild pokemon; 1-31 is for basic, inexperienced trainers; 32-47 for trainers with some skill; 48-99 for trainers with high skill, and 100 for expert trainers like gym leaders and the E4.
+
+
+<div style="clear:both"></div>
+== PokeBattle_SceneConstants ==
+This section defines the <code>PokeBattle_SceneConstants</code> module, which contains various values which are used to determine the layout and appearance of the battle screen.
+
+
+<div style="clear:both"></div>
+== PokeBattle_Scene ==
+{{main|Battles}}
+This section defines the <code>PokeBattle_Scene</code> class and several helper classes, which handle all the visual features of the battle screen, including the command menus, information boxes, all the sprites, and various animations (Pokémon being called out/returned, throwing Poké Balls, fainting, HP/EXP bars, etc.).
+
+Note: This section used to be called PokeBattle_ActualScene prior to version 16 of Essentials.
+
+
+<div style="clear:both"></div>
+== PokeBattle_AnimationPlayer ==
+This section defines a few classes that handle the displaying of animations that were defined in the Database or the [[Attack animations|Animation Editor]], and the conversion of the former to the latter. The vast majority of these animations are those used in battle.
+
+
+<div style="clear:both"></div>
+== PokeBattle_SafariZone ==
+{{main|Safari Zone}}
+This section defines the <code>PokeBattle_SafariZone</code> and <code>PokeBattle_FakeBattler</code> classes, which handle the battle process for Safari Zone battles (instead of <code>PokeBattle_Battle</code>).
+
+
+<div style="clear:both"></div>
+== PokeBattle_BattlePalace ==
+This section defines the <code>PokeBattle_BattlePalace</code> class, a subclass of PokeBattle_Battle, which allows Battle Frontier-style Battle Palace battles, where pokemon choose their own moves based on their nature.
+
+
+<div style="clear:both"></div>
+== PokeBattle_BattleArena ==
+This section defines the <code>PokeBattle_BattleArena</code> class, a subclass of PokeBattle_Battle, which allows Battle Frontier-style Battle Arena battles, where two pokemon fight for three rounds and are then judged on their mind, body, and skill rankings.
+
+
+<div style="clear:both"></div>
+== PokeBattle_BattleRecord ==
+{|class="wikitable mw-collapsible" style="float:right; font-size:0.8em;"
+! Defines 
+|- 
+| <pre style="padding:4px;">
+PokeBattle_RecordedBattle
+PokeBattle_RecordedBattlePalace
+PokeBattle_RecordedBattleArena
+PokeBattle_BattlePlayer
+PokeBattle_BattlePalacePlayer
+PokeBattle_BattleArenaPlayer
+</pre>
+|}
+This section defines several subclasses which allow Essentials to record and play back recorded battles. This is used in the PBattle_OrgBattle section to record the organized battles.
+
+
+
+<div style="clear:both"></div>
+== PokeBattle_OtherScenes ==
+This section contains classes which defined simple, debug implementation of a battle scene. It is mainly used for debugging purposes.
+
+Note: This section used to be called PokeBattle_Scene prior to version 16 of Essentials.
+
+
+<div style="clear:both"></div>
+== PokeBattle_BattlePeer ==
+This section defines the <code>PokeBattle_RealBattlePeer</code> class, which handles the storing of newly-caught Pokémon in either the [[party]] or [[Pokémon storage]].
+
+
+<div style="clear:both"></div>
+== PokeBattle_Clauses ==
+This section extends the <code>PokeBattle_Battle</code> and <code>PokeBattle_Battler</code> classes, as well as a few move classes, to handle various battle rules that can be applied to battles, e.g. in the Battle Factory and various Stadium cups. This includes things like the "sleepclause", the "evasionclause", the "selfkoclause", etc.
+
+
+<div style="clear:both"></div>
+== PBTerrain ==
+{|class="wikitable mw-collapsible" style="float:right; font-size:0.8em;"
+! Defines 
+|- 
+| <pre style="padding:4px;">
+PBTerrain.isWater?
+PBTerrain.isGrass?
+PBTerrain.isLedge?
+PBTerrain.isIce?
+PBTerrain.isBridge?
+PBTerrain.hasReflections?
+</pre>
+|}
+This section defines the <code>PBTerrain</code> module, which enumerates the available terrain tags that can be used on a tileset. 
+
+
+<div style="clear:both"></div>
+== PField_Field ==
+{|class="wikitable mw-collapsible" style="float:right; font-size:0.8em;"
+! Defines 
+|- 
+| <pre style="padding:4px;">
+DarknessSprite
+LocationWindow
+LightEffect
+EncounterModifier
+Events
+  .onAction
+  .onStartBattle
+  .onEndBattle
+  .onMapCreate
+  .onMapChange
+  .onMapChanging
+  .onStepTaken
+  .onLeaveTile
+  .onStepTakenFieldMovement
+  .onStepTakenTransferPossible
+  .onMapUpdate
+  .onWildBattleOverride
+  .onWildBattleEnd
+  .onWildPokemonCreate
+  .onTrainerPartyLoad
+  .onMapSceneChange
+  .onSpritesetCreate
+pbBattleAnimation
+pbGenerateWildPokemon
+pbWildBattle
+pbCheckAllFainted
+pbEvolutionCheck
+Kernel.pbPickup
+Kernel.pbSlideOnIce
+Kernel.pbUpdateVehicle
+Kernel.pbStartOver
+Kernel.pbItemBall
+pbRecord
+pbEventFacesPlayer?
+pbFacingTile
+Kernel.pbMoveTowardPlayer
+</pre>
+|}
+This section contains the bulk of the code for various things done in the field (that is, the overworld). These include:
+
+* Circle of darkness (for dark caves where Flash hasn't been used yet).
+* Location signpost window (showing the map's name when stepping onto a new map).
+* Light effects (for sprites that illuminate areas - shadows being cast are defined elsewhere).
+* The animation used to fade the screen before a battle.
+* Generating [[Encounters|wild Pokémon]] and [[battles]] with them (both single and double).
+* The [[Abilities|Pickup ability]].
+* Jumping over a ledge.
+* Events that automatically occur:
+** When a battle is started.
+** When the player takes a step (poison and happiness gain, sliding on ice, animating tall grass).
+** When the player enters a different map (change the weather, display the location window, etc.).
+** When the map scene changes (e.g. Flash is used, automatically mount the [[Getting around|bicycle]]).
+** When the map updates (i.e. every frame).
+* Setting the last visited [[Poké Center]] location.
+* Starting/finishing surfing and cycling.
+* [[Fishing encounters|Fishing]].
+* [[Map transfers|Whiting out]] after having all [[party]] Pokémon faint, and returning to the last [[Poké Center]] visited.
+* The animation for entering a cave.
+* Registering and deregistering a [[partner trainer]].
+* Recording sound.
+* Interacting with an [[Item balls|item ball]], and receiving an item from an NPC.
+* [[Obstacles|Boulder]] movements.
+
+
+<div style="clear:both"></div>
+== PField_FieldWeather ==
+{{main|Weather}}
+This section defines the <code>PBFieldWeather</code> module, which enumerates all the types of field weather available. It also extends the <code>RPG::Weather</code> class to handle the animations for out-of-battle weather. All other aspects of weather are handled elsewhere.
+
+
+
+<div style="clear:both"></div>
+== PField_Metadata ==
+This section defines the <code>PokemonGlobalMetadata</code> class, which is stored in <code>$PokemonGlobal</code>. This class stores a lot of miscellaneous data, including things like if the player is surfing or cycling, the player's step count, the players last pokemon center, the daycare, the mailbox, the item pc storage, etc.
+
+
+<div style="clear:both"></div>
+== PField_MapFactory ==
+This section defines the <code>MapFactoryHelper</code> module and the <code>PokemonMapFactory</code> class. They handle loading and displaying map connections, and collisions across connection boundaries.
+
+
+<div style="clear:both"></div>
+== PField_HiddenMoves ==
+{|class="wikitable mw-collapsible" style="float:right; font-size:0.8em;"
+! Defines 
+|- 
+| <pre style="padding:4px;">
+Kernel.pbCanUseHiddenMove?
+Kernel.pbUseHiddenMove
+Kernel.pbHiddenMoveEvent
+pbHiddenMoveAnimation
+Kernel.pbCut
+Kernel.pbHeadbutt
+Kernel.pbRockSmash
+Kernel.pbStrength
+Kernel.pbSurf
+Kernel.pbWaterfall
+Kernel.pbDive
+Kernel.pbTransferUnderwater
+Kernel.pbTransferSurfing
+</pre>
+|}
+{{Main|Using moves outside battle}}
+This section defines the <code>HiddenMoveHandlers</code> module, which handles using moves outside battle. The bulk of this section contains handlers and methods for each of the field moves, including handlers for using them from the menu and using them by interacting with [[Obstacles|events]] or particular [[Tilesets|terrain tags]].
+
+Handlers added to <code>HiddenMoveHandlers::CanUseMove</code> and <code>HiddenMoveHandlers::UseMove</code> will be called when the player selects a move from the party menu, while the various Kernel.* methods defined are to be called from events.
+
+This section also defines <code>Kernel.pbTransferSurfing</code> and <code>Kernel.pbTransferUnderwater</code>. If a doorway uses the normal transfer command, it automatically cancels any surfing or diving animations for the player. Thus, if the player can only travel through a given doorway while surfing or diving, you must use these respective methods to keep the player in the state of surfing or diving when they arrive on the other side of the transfer.
+
+
+<div style="clear:both"></div>
+== PField_Encounters ==
+{{main|Encounters}}
+This section defines the <code>EncounterTypes</code> module, which enumerates the encounter types and rates. It also defines the <code>PokemonEncounters</code> class, which handles other information relating to wild Pokémon encounters, including generating them.
+
+
+<div style="clear:both"></div>
+== PField_EncounterModifiers ==
+{{main|Encounters}}
+This section is for procedures which change wild Pokémon encounters in some way. An existing example is one which makes the wild Pokémon shiny if a certain Global Switch is ON.
+
+
+<div style="clear:both"></div>
+== PField_RoamingPokemon ==
+{|class="wikitable mw-collapsible" style="float:right; font-size:0.8em;"
+! Defines 
+|- 
+| <pre style="padding:4px;">
+pbResetAllRoamers
+pbRoamPokemon
+pbRoamingPokemonBattle
+</pre>
+|}
+{{main|Roaming Pokémon}}
+This section defines several methods which handle roaming Pokémon. It keeps track of all roaming Pokémon, changes their positions when a new map is entered, and triggers a battle with a roamer if appropriate.
+
+
+<div style="clear:both"></div>
+== PField_RandomDungeons ==
+{|class="wikitable mw-collapsible" style="float:right; font-size:0.8em;"
+! Defines 
+|- 
+| <pre style="padding:4px;">
+AntiRandom
+DungeonMaze
+Maze
+Dungeon
+pbRandomRoomTile
+</pre>
+|}
+{{main|Dungeons}}
+This section defines several classes to handle the generation of random dungeon maps.
+
+
+<div style="clear:both"></div>
+== PField_BerryPlants ==
+{|class="wikitable mw-collapsible" style="float:right; font-size:0.8em;"
+! Defines 
+|- 
+| <pre style="padding:4px;">
+pbBerryPlant
+pbPickBerry
+BerryPlantSprite
+BerryPlantMoistureSprite
+</pre>
+|}
+{{main|Berry planting}}
+This section defines the <code>pbBerryPlant</code> method, along with helper classes, which handle the berry planting process. 
+
+
+<div style="clear:both"></div>
+== PField_DayCare ==
+{|class="wikitable mw-collapsible" style="float:right; font-size:0.8em;"
+! Defines 
+|- 
+| <pre style="padding:4px;">
+pbEggGenerated?
+pbDayCareDeposited
+pbDayCareDeposit
+pbDayCareGetLevelGain
+pbDayCareGetDeposited
+pbDayCareWithdraw
+pbDayCareChoose
+pbDayCareGenerateEgg
+</pre>
+|}
+{{main|Day Care}}
+{{main|Breeding}}
+This section defines several methods which handle the Day Care system, both the storing of Pokémon to be trained and the breeding aspect. It contains scripts that determine whether or not breeding should take place, generate [[eggs]] when appropriate, give experience to stored Pokémon, teach moves to Pokémon as they level up while in training, etc.
+
+
+<div style="clear:both"></div>
+== PField_DependentEvents ==
+{|class="wikitable mw-collapsible" style="float:right; font-size:0.8em;"
+! Defines 
+|- 
+| <pre style="padding:4px;">
+pbRemoveDependencies
+pbAddDependency
+pbRemoveDependency
+pbAddDependency2
+pbGetDependency
+pbRemoveDependency2
+DependentEvents
+  .pbEnsureEvent
+  .pbFollowEventAcrossMaps
+  .updateDependentEvents
+DependentEventSprites
+</pre>
+|}
+{{main|Partner trainer}}
+This section defines the <code>DependentEvents</code> class, which handles dependent events. 
+
+
+<div style="clear:both"></div>
+== PField_Time ==
+{|class="wikitable mw-collapsible" style="float:right; font-size:0.8em;"
+! Defines 
+|- 
+| <pre style="padding:4px;">
+pbGetTimeNow
+PBDayNight.isDay?
+PBDayNight.isNight?
+PBDayNight.isMorning?
+PBDayNight.isAfternoon?
+PBDayNight.isEvening?
+PBDayNight.getShade
+pbDayNightTint
+moonphase
+zodiac
+pbIsWeekday
+pbIsMonth
+pbIsSeason
+pbIsSpring
+</pre>
+|}
+{{main|Time}}
+This section defines the <code>PBDayNight</code> module, which handles the day/night system in Essentials. It also contains some methods that calculate various astrological features (e.g. the moon's phase, the zodiac sign), and methods that check the current day, month, and season.
+
+
+<div style="clear:both"></div>
+== PokeBattle_Trainer ==
+{|class="wikitable mw-collapsible" style="float:right; font-size:0.8em;"
+! Defines 
+|- 
+| <pre style="padding:4px;">
+PokeBattle_Trainer
+  .getForeignID
+  .outfit
+  .pokemonParty
+  .ablePokemonParty
+  .firstAblePokemon
+  .lastPokemon
+</pre>
+|}
+{{main|Player}}
+This section defines the <code>PokeBattle_Trainer</code> class, which handles a trainer's information, including their name, badges owned, money, their current [[party]], the [[Pokédex]] completion and so on. The [[player]] is the primary example of this class, and the only persistent instance (stored in <code>$Trainer</code>). But a PokeBattle_Trainer instance is created for every trainer participant when a battle begins.
+
+
+<div style="clear:both"></div>
+== PTrainer_NPCTrainers ==
+{|class="wikitable mw-collapsible" style="float:right; font-size:0.8em;"
+! Defines 
+|- 
+| <pre style="padding:4px;">
+pbLoadTrainer
+pbTrainerCheck
+pbMissingTrainer
+pbTrainerBattle
+pbDoubleTrainerBattle
+TrainerWalkingCharSprite
+</pre>
+|}
+{{main|Trainers}}
+This section defines several methods which handle enemy trainers, most notably the trainer battle methods. <code>pbLoadTrainer</code> loads and check individual trainers and their teams (from the [[PBS file]] "trainers.txt"). Debug features such as the ability to add a new trainer are also defined here.
+
+
+<div style="clear:both"></div>
+== PItem_Items ==
+{|class="wikitable mw-collapsible" style="float:right; font-size:0.8em;"
+! Defines 
+|- 
+| <pre style="padding:4px;">
+pbIsHiddenMove?
+pbGetPocket
+pbIsMachine?
+pbIsMail?
+pbIsSnagBall?
+pbIsKeyItem?
+pbIsMegaStone?
+pbChangeLevel
+pbItemRestoreHP
+pbHPItem
+pbRaiseEffortValues
+pbRestorePP
+pbBikeCheck
+pbClosestHiddenItem
+pbLearnMove
+pbUseItem
+ItemHandlers.addUseFromBag
+ItemHandlers.addUseInField
+ItemHandlers.addUseOnPokemon
+ItemHandlers.addBattleUseOnBattler
+ItemHandlers.addBattleUseOnPokemon
+</pre>
+|}
+{{main|Items}}
+This section defines several methods which handle various generic effects an item can have (e.g. modify HP/PP), as well as teaching a move to a Pokémon. It also contains a few useful methods that can be used to decide what kind of item something is (e.g. one you shouldn't toss, a mail item, etc.).
+
+
+<div style="clear:both"></div>
+== PItem_ItemEffects ==
+{{main|Item effects}}
+This section defines over a hundred handlers implementing the effects of each item that can be actively used (i.e. not held items).
+
+
+<div style="clear:both"></div>
+== PItem_PokeBalls ==
+{|class="wikitable mw-collapsible" style="float:right; font-size:0.8em;"
+! Defines 
+|- 
+| <pre style="padding:4px;">
+BallHandlers::IsUnconditional
+BallHandlers::ModifyCatchRate
+BallHandlers::OnCatch
+BallHandlers::OnFailCatch
+pbBallTypeToBall
+pbGetBallType
+$BallTypes
+</pre>
+|}
+{{main|Items}}
+This section defines the handlers for modifying the various Poké Balls, or handling their effects. This file also has the mapping from ball type to PBItem enum.
+
+
+<div style="clear:both"></div>
+== PItem_PokeRadar ==
+{|class="wikitable mw-collapsible" style="float:right; font-size:0.8em;"
+! Defines 
+|- 
+| <pre style="padding:4px;">
+pbCanUsePokeRadar?
+pbUsePokeRadar
+pbPokeRadarHighlightGrass
+pbPokeRadarGetShakingGrass
+pbPokeRadarGetEncounter
+</pre>
+|}
+{{main|Poké Radar}}
+This section defines methods and item handlers to operate the Poké Radar, including using the item, making grass shake and changing the probability that the chained Pokémon are shiny.
+
+
+<div style="clear:both"></div>
+== PItem_Mail ==
+{|class="wikitable mw-collapsible" style="float:right; font-size:0.8em;"
+! Defines 
+|- 
+| <pre style="padding:4px;">
+PokemonMail
+pbMoveToMailbox
+pbStoreMail
+pbDisplayMail
+</pre>
+|}
+This section defines the <code>PokemonMail</code> class, as well as several helper methods to use and move mail around.
+
+
+<div style="clear:both"></div>
+== PItem_Sprites ==
+This section defines the <code>ItemIconSprite</code> class, which handles displaying the item icon in the bag or mart screen. Interestingly, the icons can be animated if the icon is a 48 pixel tall image that has its animation frames laid out horizontally (48 pixels wide for each frame).
+
+
+<div style="clear:both"></div>
+== PokeBattle_Pokemon ==
+{|class="wikitable mw-collapsible" style="float:right; font-size:0.8em;"
+! Defines 
+|- 
+| <pre style="padding:4px;">
+PokeBattle_Pokemon
+  .isForeign?
+  .timeReceived
+  .isEgg?
+  .isMale?
+  .makeMale
+  .setAbility
+  .hasHiddenAbility?
+  .isShiny?
+  .makeShiny
+  .makeNotShiny
+  .givePokerus
+  .hasType?
+  .knowsMove?
+  .resetMoves
+  .pbLearnMove
+  .pbRecordFirstMoves
+  .hasRibbon?
+  .hasItem?
+  .unownShape
+  .heal
+  .calcStats
+</pre>
+|}
+{{main|Pokémon}}
+This section defines the <code>PokeBattle_Pokemon</code> class, which (despite its name) defines a Pokémon outside of battle.
+
+
+
+<div style="clear:both"></div>
+== Pokemon_MultipleForms ==
+{|class="wikitable mw-collapsible" style="float:right; font-size:0.8em;"
+! Defines 
+|- 
+| <pre style="padding:4px;">
+PokeBattle_Pokemon
+  .form
+  .forceForm
+MultipleForms
+pbSpindaSpots
+</pre>
+|}
+{{main|Multiple forms}}
+This section extends the <code>PokeBattle_Pokemon</code> class and defines the <code>MultipleForms</code> module to handle the multiple forms some Pokémon can have, and defines all the stats and other information for each form that differs from its base form.
+
+
+<div style="clear:both"></div>
+== Pokemon_MegaEvolution ==
+{{main|Mega Evolution}}
+This section extends the <code>PokeBattle_Pokemon</code> class to add mega forms to all appropriate pokemon, by adding handlers to the the MultipleForms module defined above.
+
+
+<div style="clear:both"></div>
+== Pokemon_ShadowPokemon ==
+{|class="wikitable mw-collapsible" style="float:right; font-size:0.8em;"
+! Defines 
+|- 
+| <pre style="padding:4px;">
+pbPurify
+pbRelicStoneScreen
+pbRelicStone
+pbIsPurifiable?
+pbRaiseHappinessAndReduceHeart
+PokeBattle_Pokemon
+  .hypermode
+  .heartStage
+  .makeShadow
+pbReadyToPurify
+PokeBattle_Battler
+  .pbHyperMode
+  .pbHyperModeObedience
+</pre>
+|}
+{{main|Shadow Pokémon}}
+This section handles everything related to Shadow Pokémon. This section defines the heart gauges on pokemon, defines the Relic Stone, adds handlers for scent items, defines the effects of Hyper Mode (actually Pokemon XD-style "Reverse Mode", but misnamed "Hyper Mode"), and defines classes for every shadow move introduced in XD.
+
+The Purify Chamber is handled in its own section.
+
+
+<div style="clear:both"></div>
+== Pokemon_Evolution ==
+{|class="wikitable mw-collapsible" style="float:right; font-size:0.8em;"
+! Defines 
+|- 
+| <pre style="padding:4px;">
+PBEvolution
+SpriteMetafile
+SpriteMetafilePlayer
+PokemonEvolutionScene
+pbGetEvolvedFormData
+pbGetPreviousForm
+pbGetMinimumLevel
+pbGetBabySpecies
+pbSaveSpriteState
+pbRestoreSpriteState
+pbSaveSpriteStateAndBitmap
+pbRestoreSpriteStateAndBitmap
+pbCheckEvolution
+</pre>
+|}
+{{main|Evolution}}
+This section defines the <code>PBEvolution</code> module, which enumerates all of the various evolution methods available (including 5 "custom" methods). It also defines <code>PokemonEvolutionScene</code>, which plays the evolution animation scene, and the <code>pbCheckEvolution</code> method, which checks if the pokemon can evolve now.
+
+
+<div style="clear:both"></div>
+== Pokemon_Chatter ==
+This section defines the <code>pbChatter</code>, which handles the out-of-battle part of the move Chatter, which is the ability to record a new sound for it to use.
+
+
+<div style="clear:both"></div>
+== Pokemon_Sprites ==
+{|class="wikitable mw-collapsible" style="float:right; font-size:0.8em;"
+! Defines 
+|- 
+| <pre style="padding:4px;">
+PokemonSprite
+PokemonBattlerSprite
+PokemonIconSprite
+PokemonSpeciesIconSprite
+getBattleSpriteMetricOffset
+adjustBattleSpriteY
+pbPositionPokemonSprite
+pbSpriteSetCenter
+showShadow?
+</pre>
+|}
+This section defines four sprite classes for displaying pokemon. It also defines methods that handle adjusting the height of battler sprites according to the three metrics defined for that species in the [[PBS file]] "pokemon.txt". 
+
+
+<div style="clear:both"></div>
+== PScreen_PauseMenu ==
+{{main|Pause menu}}
+This section defines <code>PokemonMenu_Scene</code> and <code>PokemonMenu</code>, which handles the Pause menu. There is code in here to modify the menu when the player is in the [[Safari Zone]] or a [[Bug Catching Contest]].
+
+
+<div style="clear:both"></div>
+== PScreen_Pokedex ==
+{|class="wikitable mw-collapsible" style="float:right; font-size:0.8em;"
+! Defines 
+|- 
+| <pre style="padding:4px;">
+Window_DexesList
+Scene_PokedexMenu
+Window_CommandPokemonWhiteArrow
+Window_Pokedex
+Window_ComplexCommandPokemon
+PokemonPokedexScene
+PokemonPokedex
+</pre>
+|}
+{{main|Pokédex}}
+This section defines <code>PokemonPokedexScene</code>, which handles the Pokédex screens, namely everything except the Area and Forms pages.
+
+
+<div style="clear:both"></div>
+== PScreen_PokedexNestForm ==
+{|class="wikitable mw-collapsible" style="float:right; font-size:0.8em;"
+! Defines 
+|- 
+| <pre style="padding:4px;">
+pbFindEncounter
+PokemonNestMapScene
+PokemonNestMap
+PokedexFormScene
+PokedexForm
+</pre>
+|}
+{{main|Pokédex}}
+This section defines <code>PokemonNestMapScene</code> and <code>PokedexFormScene</code>, which handles (respectfully) the Area and Forms pages of the Pokédex.
+
+
+<div style="clear:both"></div>
+== PScreen_Party ==
+{|class="wikitable mw-collapsible" style="float:right; font-size:0.8em;"
+! Defines 
+|- 
+| <pre style="padding:4px;">
+PokeSelectionPlaceholderSprite
+PokeSelectionConfirmCancelSprite
+PokeSelectionCancelSprite
+PokeSelectionConfirmSprite
+ChangelingSprite
+PokeSelectionSprite
+PokemonScreen_Scene
+PokemonScreen
+</pre>
+|}
+{{main|Party}}
+This section defines <code>PokemonScreen</code>, which handles the party screen and choosing Pokémon from the party.
+
+
+<div style="clear:both"></div>
+== PScreen_Summary ==
+{|class="wikitable mw-collapsible" style="float:right; font-size:0.8em;"
+! Defines 
+|- 
+| <pre style="padding:4px;">
+MoveSelectionSprite
+PokemonSummaryScene
+PokemonSummary
+</pre>
+|}
+{{Main|Summary screens}}
+This section defines <code>PokemonSummaryScene</code>, which handles the Pokémon summary screens, accessible from the [[Party]] screen and [[Pokémon storage]]. Data relevant to the selected Pokémon is displayed across five pages.
+
+
+<div style="clear:both"></div>
+== PScreen_Bag ==
+{|class="wikitable mw-collapsible" style="float:right; font-size:0.8em;"
+! Defines 
+|- 
+| <pre style="padding:4px;">
+Window_PokemonBag
+PokemonBag_Scene
+PokemonBagScreen
+PokemonBag
+Window_PokemonItemStorage
+ItemStorageScene
+WithdrawItemScene
+TossItemScene
+PCItemStorage
+UIHelper
+</pre>
+|}
+{{main|Bag}}
+This section defines the <code>PokemonBag</code> and <code>PCItemStorage</code> classes, which hold the items the player is carrying (stored in <code>$PokemonBag</code> and <code>$PokemonGlobal.pcItemStorage</code>, respectfully). This section also defines the <code>PokemonBagScreen</code> and <code>ItemStorageScene</code> classes, which handle the Bag screen and [[PC|item storage]] screen, respectfully.
+
+
+<div style="clear:both"></div>
+== PScreen_Pokegear ==
+{|class="wikitable mw-collapsible" style="float:right; font-size:0.8em;"
+! Defines 
+|- 
+| <pre style="padding:4px;">
+PokegearButton
+Scene_Pokegear
+</pre>
+|}
+{{main|Pokégear}}
+This section defines the <code>Scene_Pokegear</code> class, which handles the [[Pokégear]]'s main screen, i.e. the list of applications it has.
+
+
+<div style="clear:both"></div>
+== PScreen_RegionMap ==
+{|class="wikitable mw-collapsible" style="float:right; font-size:0.8em;"
+! Defines 
+|- 
+| <pre style="padding:4px;">
+MapBottomSprite
+PokemonRegionMapScene
+PokemonRegionMap
+pbShowMap
+</pre>
+|}
+{{main|Region map}}
+This section defines the <code>PokemonRegionMapScene</code> screen, which handles displaying the region map. It is used when examining a map (from the [[Pokégear]], the Town Map item, or a map on a wall) or when [[Using moves outside battle|using Fly]]. This section defines the <code>pbShowMap</code> method, which can be called from an event to display a wall map.
+
+
+<div style="clear:both"></div>
+== PScreen_Phone ==
+{|class="wikitable mw-collapsible" style="float:right; font-size:0.8em;"
+! Defines 
+|- 
+| <pre style="padding:4px;">
+Window_PhoneList
+PokemonPhoneScene
+pbRandomPhoneTrainer
+pbPhoneRegisterNPC
+pbPhoneRegister
+pbPhoneRegisterBattle
+pbPhoneDeleteContact
+pbPhoneReadyToBattle?
+pbCallTrainer
+pbSetReadyToBattle
+pbPhoneGenerateCall
+pbEncounterSpecies
+pbTrainerMapName
+pbTrainerSpecies
+pbPhoneCall
+</pre>
+|}
+{{main|Phone}}
+This section defines the <code>PokemonPhoneScene</code> and several methods which handle the phone, including registering trainers, generating random phone calls, deciding when the trainers become available for [[rematches]], and the phone screen.
+
+
+<div style="clear:both"></div>
+== PScreen_Jukebox ==
+{{main|Jukebox}}
+This section defines the <code>Scene_Jukebox</code> class, which handles the [[Jukebox]] application of the [[Pokégear]].
+
+
+<div style="clear:both"></div>
+== PScreen_TrainerCard ==
+{{main|Trainer card}}
+This section defines the <code>PokemonTrainerCardScene</code> and <code>PokemonTrainerCard</code> classes, which handle the Trainer card screen.
+
+
+<div style="clear:both"></div>
+== PScreen_Load ==
+{|class="wikitable mw-collapsible" style="float:right; font-size:0.8em;"
+! Defines 
+|- 
+| <pre style="padding:4px;">
+PokemonLoadPanel
+PokemonLoadScene
+PokemonLoad
+FontInstaller
+</pre>
+|}
+{{main|Saving and loading}}
+This section defines the <code>PokemonLoad</code> class. This class handles loading data from the save file, as well as displaying the [[Game intro|Continue/New Game screen]], starting a new game, and deleting a save file.
+
+This section also contains the <code>FontInstaller</code> class, which checks whether the necessary fonts are installed, and attempts to install them if they are not.
+
+
+<div style="clear:both"></div>
+== PScreen_Save ==
+{|class="wikitable mw-collapsible" style="float:right; font-size:0.8em;"
+! Defines 
+|- 
+| <pre style="padding:4px;">
+PokemonSaveScene
+pbEmergencySave
+pbSave
+PokemonSave
+</pre>
+|}
+{{main|Saving and loading}}
+This section defines the <code>pbSave</code> method, which handles saving the game.
+
+
+<div style="clear:both"></div>
+== PScreen_Options ==
+{|class="wikitable mw-collapsible" style="float:right; font-size:0.8em;"
+! Defines 
+|- 
+| <pre style="padding:4px;">
+Window_PokemonOption
+EnumOption
+NumberOption
+SliderOption
+PokemonSystem
+PokemonOptionScene
+PokemonOption
+</pre>
+|}
+{{main|Options screen}}
+This section defines <code>PokemonOptionScene</code>, which handles the Options screen. This screen includes settings for the window skin, font, text speed, etc. It also lists the available message box skins and fonts.
+
+Lines 512 to 526 and specially marked with comments in this section: if you do not want your players to be able to change the size of the game from the default "Medium" (that is, 2 times the size of pokemon's graphics), you should comment out or delete that section.
+
+
+<div style="clear:both"></div>
+== PScreen_Storage ==
+{{main|Pokémon storage}}
+{{main|PC}}
+{|class="wikitable mw-collapsible" style="float:right; font-size:0.8em;"
+! Defines 
+|- 
+| <pre style="padding:4px;">
+PokemonBox
+PokemonStorage
+PokemonStorageWithParty
+PokemonStorageScreen
+Interpolator
+PokemonBoxArrow
+PokemonBoxPartySprite
+MosaicPokemonSprite
+AutoMosaicPokemonSprite
+PokemonBoxSprite
+PokemonStorageScene
+RegionalStorage
+TrainerPC
+StorageSystemPC
+Kernel.pbGetStorageCreator
+pbPCItemStorage
+pbPCMailbox
+pbTrainerPC
+pbPokeCenterPC
+PokemonPCList.registerPC
+</pre>
+|}
+This section defines <code>PokemonStorage</code> and <code>PokemonBox</code>, which contain pokemon stored in the storage system. It also defines various classes to implement the storage screen, and a class to handle Regional Pokémon storage.
+
+At the bottom of this section, there are scripts that handle what happens when [[PC|the PC]] is used (i.e. the menus and mail storage). 
+
+Note: This section adds the Storage System PC and Trainer PC to the Pokemon Center PC list that is displayed when the player turns on a PC. It does this by creating classes for each, with the methods <code>shouldShow?</code>, <code>name</code>, and <code>access</code> defined, and passing a new instance of that class to <code>PokemonPCList.registerPC</code>. 
+
+
+<div style="clear:both"></div>
+== PScreen_EggHatching ==
+{|class="wikitable mw-collapsible" style="float:right; font-size:0.8em;"
+! Defines 
+|- 
+| <pre style="padding:4px;">
+PokemonEggHatchScene
+PokemonEggHatchScreen
+pbHatchAnimation
+pbHatch
+</pre>
+|}
+This section contains all the scripts relating to the hatching of eggs, including the animation that plays when an egg hatches and the timer which reduces the number of steps left before an egg hatches.
+
+
+<div style="clear:both"></div>
+== PScreen_Trading ==
+{|class="wikitable mw-collapsible" style="float:right; font-size:0.8em;"
+! Defines 
+|- 
+| <pre style="padding:4px;">
+PokemonTradeScene
+pbStartTrade
+pbTradeCheckEvolution
+</pre>
+|}
+{{main|Trading Pokémon}}
+This section defines the <code>pbStartTrade</code> method, which handles the Pokémon trade screen. It also contains a check for whether the newly received Pokémon should evolve because of the trade.
+
+
+<div style="clear:both"></div>
+== PScreen_MoveRelearner ==
+{|class="wikitable mw-collapsible" style="float:right; font-size:0.8em;"
+! Defines 
+|- 
+| <pre style="padding:4px;">
+MoveRelearnerScene
+MoveRelearnerScreen
+pbEachNaturalMove
+pbGetRelearnableMoves
+pbRelearnMoveScreen
+</pre>
+|}
+{{main|Special NPCs}}
+This section defines the <code>pbRelearnMoveScreen</code> method, which handles the Move Relearner feature. It handles the teaching part only; usually there is a price to pay for this feature, and that should be implemented separately.
+
+
+<div style="clear:both"></div>
+== PScreen_PurifyChamber ==
+{|class="wikitable mw-collapsible" style="float:right; font-size:0.8em;"
+! Defines 
+|- 
+| <pre style="padding:4px;">
+PurifyChamberSet
+PurifyChamber
+PurifyChamberPC
+PurifyChamberHelper
+PurifyChamberScreen
+Window_PurifyChamberSets
+DirectFlowDiagram
+FlowDiagram
+PurifyChamberSetView
+PurifyChamberScene
+pbPurifyChamber
+</pre>
+|}
+{{main|Shadow Pokémon}}
+This section defines the <code>pbPurifyChamber</code> method, and many support classes, which handle the Purify Chamber for Shadow Pokémon. This section adds the Purify Chamber option to the PC in the same way as outlined in PScreen_Storage.
+
+
+<div style="clear:both"></div>
+== PScreen_Mart ==
+{|class="wikitable mw-collapsible" style="float:right; font-size:0.8em;"
+! Defines 
+|- 
+| <pre style="padding:4px;">
+PokemonMartAdapter
+RpgxpMartAdapter
+Window_PokemonMart
+PokemonMartScene
+PokemonMartScreen
+pbPokemonMart
+</pre>
+|}
+{{main|Poké Mart}}
+This section defines the <code>pbPokemonMart</code> method, which handles the Poké Mart screen.
+
+
+<div style="clear:both"></div>
+== PScreen_MysteryGift ==
+{|class="wikitable mw-collapsible" style="float:right; font-size:0.8em;"
+! Defines 
+|- 
+| <pre style="padding:4px;">
+MYSTERYGIFTURL
+pbEditMysteryGift
+pbCreateMysteryGift
+pbManageMysteryGifts
+pbRefreshMGCommands
+pbDownloadMysteryGift
+pbReceiveMysteryGift
+</pre>
+|}
+{{main|Mystery Gift}}
+This section handles the Mystery Gift system. The methods defined here are called by the load screen, defined above.
+
+Tip: The MYSTERYGIFTURL constant, defined at the top of this file, is the URL the game will check for the mystery gift. This url must point to the raw text file and not a landing page generated by an uploading service. You can test to see if the game will accept the mystery gift file by putting the url you have into a browser's incognito mode / private browsing mode window. If you can load up the text file in that window without logging into anything or clicking through anything, then the game will be able to access the text file successfully itself.
+
+
+<div style="clear:both"></div>
+== PScreen_HallOfFame ==
+{|class="wikitable mw-collapsible" style="float:right; font-size:0.8em;"
+! Defines 
+|- 
+| <pre style="padding:4px;">
+HallOfFameScene
+HallOfFameScreen
+HallOfFamePC
+pbHallOfFameEntry
+pbHallOfFamePC
+</pre>
+|}
+This section defines the <code>HallOfFameScene</code> class, which contains all the scripts related to the Hall of Fame. This section adds the Hall of Fame option to the PC in the same way as outlined in PScreen_Storage.
+
+
+<div style="clear:both"></div>
+== PBattle_Safari ==
+{|class="wikitable mw-collapsible" style="float:right; font-size:0.8em;"
+! Defines 
+|- 
+| <pre style="padding:4px;">
+SafariState
+pbInSafari?
+pbSafariState
+pbSafariBattle
+</pre>
+|}
+{{main|Safari Zone}}
+This section handles the Safari Zone, except the Safari Zone battles themselves. It keeps track of steps taken, Balls remaining, etc.
+
+
+<div style="clear:both"></div>
+== PBattle_BugContest ==
+{|class="wikitable mw-collapsible" style="float:right; font-size:0.8em;"
+! Defines 
+|- 
+| <pre style="padding:4px;">
+BugContestState
+pbBugContestScore
+pbBugContestState
+pbInBugContest?
+PokeBattle_BugContestBattle
+Kernel.pbBugContestStartOver
+pbBugContestBattle
+</pre>
+|}
+{{main|Bug Catching Contest}}
+This section handles all aspects of Bug Catching Contests, including battles, keeping track of time, Park Balls, and judging.
+
+
+<div style="clear:both"></div>
+== PBattle_OrgBattle ==
+{|class="wikitable mw-collapsible" style="float:right; font-size:0.8em;"
+! Defines 
+|- 
+| <pre style="padding:4px;">
+PBPokemon
+BattleChallengeType
+BattleChallengeData
+BattleChallenge
+BattleFactoryData
+pbHasEligible?
+pbIsBanned?
+pbGetBTTrainers
+pbGetBTPokemon
+pbRecordLastBattle
+pbPlayBattle
+pbPlayLastBattle
+pbBattleChallenge
+pbBattleChallengeTrainer
+pbBattleFactoryPokemon
+pbGenerateBattleTrainer
+pbOrganizedBattleEx
+</pre>
+|}
+This section defines several methods and classes related to organized Battle Frontier-style battles. This includes:
+* Methods to record a battle challenge battle.
+* Methods to create a Battle Challenge or Battle Factory battle
+* Methods to determine if a trainer has eligible pokemon.
+
+
+<div style="clear:both"></div>
+== PBattle_OrgBattleRules ==
+{|class="wikitable mw-collapsible" style="float:right; font-size:0.8em;"
+! Defines 
+|- 
+| <pre style="padding:4px;">
+LevelAdjustment
+LevelBalanceAdjustment
+SinglePlayerCappedLevelAdjustment
+OpenLevelAdjustment
+TotalLevelAdjustment
+AblePokemonRestriction
+SpeciesRestriction
+BannedSpeciesRestriction
+BannedItemRestriction
+StandardRestriction
+MaximumLevelRestriction
+WeightRestriction
+HeightRestriction
+ItemsDisallowedClause
+SameSpeciesClause
+BabyRestriction
+LittleCupRestriction
+NicknameClause
+PokemonRuleSet
+BattleType
+BattleRule
+PokemonChallengeRules
+StandardRules
+pbPikaCupRules
+pbFancyCupRules
+pbBattleTowerRules
+pbBattleFactoryRules
+</pre>
+|}
+This section defines dozens of classes related to rules and restrictions on organized battles, as well as method to combine these classes into a ruleset for use in challenges and tournaments. It also has a commented out section at the bottom which outlines various rulesets previously used by real world Tournaments put on by the Pokemon Company in the past.
+
+
+<div style="clear:both"></div>
+== PBattle_OrgBattleGenerator ==
+{|class="wikitable mw-collapsible" style="float:right; font-size:0.8em;"
+! Defines 
+|- 
+| <pre style="padding:4px;">
+BaseStatRestriction
+NonlegendaryRestriction
+InverseRestriction
+SingleMatch
+MatchHistory
+PlayerRating
+RuledTeam
+pbRandomMove
+addMove
+pbGetLegalMoves2
+baseStatTotal
+withRestr
+pbArrangeByTier
+pbRandomPokemonFromRule
+pbRuledBattle
+pbTrainerInfo
+pbGenerateChallenge
+pbWriteCup
+</pre>
+|}
+This section defines several methods and classes related to generating random trainers to adhere to a given ruleset for an organized battle. 
+
+
+<div style="clear:both"></div>
+== PBattle_BattleSwap ==
+{|class="wikitable mw-collapsible" style="float:right; font-size:0.8em;"
+! Defines 
+|- 
+| <pre style="padding:4px;">
+BattleSwapScene
+BattleSwapScreen
+</pre>
+|}
+This section defines the <code>BattleSwapScreen</code> and <code>BattleSwapScene</code> classes, which implement the pokemon rental screen used for the Battle Frontier-style Battle Factory.
+
+
+<div style="clear:both"></div>
+== PMinigame_Duel ==
+{|class="wikitable mw-collapsible" style="float:right; font-size:0.8em;"
+! Defines 
+|- 
+| <pre style="padding:4px;">
+DuelWindow
+PokemonDuel
+pbDuel
+</pre>
+|}
+{{main|Mini-games}}
+This section defines the <code>pbDuel</code> method and <code>PokemonDuel</code> class, which handles the overworld Duel mini-game.
+
+
+<div style="clear:both"></div>
+== PMinigame_TripleTriad ==
+{|class="wikitable mw-collapsible" style="float:right; font-size:0.8em;"
+! Defines 
+|- 
+| <pre style="padding:4px;">
+TriadCard
+TriadSquare
+TriadScene
+TriadScreen
+TriadStorage
+pbBuyTriads
+pbSellTriads
+pbTriadList
+pbTriadDuel
+pbGiveTriadCard
+</pre>
+|}
+{{main|Triple Triad}}
+This section defines methods and classes which handle the Triple Triad card mini-game.
+
+
+<div style="clear:both"></div>
+== PMinigame_SlotMachine ==
+{|class="wikitable mw-collapsible" style="float:right; font-size:0.8em;"
+! Defines 
+|- 
+| <pre style="padding:4px;">
+SlotMachineReel
+SlotMachineScore
+SlotMachineScene
+SlotMachine
+pbSlotMachine
+</pre>
+|}
+{{main|Mini-games}}
+This section defines the <code>pbSlotMachine</code> method, which handles the Slot Machine mini-game.
+
+
+<div style="clear:both"></div>
+== PMinigame_VoltorbFlip ==
+{|class="wikitable mw-collapsible" style="float:right; font-size:0.8em;"
+! Defines 
+|- 
+| <pre style="padding:4px;">
+VoltorbFlip
+VoltorbFlipScreen
+pbVoltorbFlip
+</pre>
+|}
+{{main|Mini-games}}
+This section defines the <code>pbVoltorbFlip</code> method, which handles the Voltorb Flip mini-game.
+
+
+<div style="clear:both"></div>
+== PMinigame_Lottery ==
+{|class="wikitable mw-collapsible" style="float:right; font-size:0.8em;"
+! Defines 
+|- 
+| <pre style="padding:4px;">
+pbSetLotteryNumber
+pbLottery
+</pre>
+|}
+{{main|Mini-games}}
+This section defines the <code>pbLottery</code> method, which handles the lottery mini-game.
+
+
+<div style="clear:both"></div>
+== PMinigame_Mining ==
+{|class="wikitable mw-collapsible" style="float:right; font-size:0.8em;"
+! Defines 
+|- 
+| <pre style="padding:4px;">
+MiningGameCounter
+MiningGameTile
+MiningGameCursor
+MiningGameScene
+MiningGame
+pbMiningGame
+</pre>
+|}
+{{main|Mini-games}}
+This section defines the <code>pbMiningGame</code> method, which handles the Mining mini-game.
+
+
+<div style="clear:both"></div>
+== PMinigame_TilePuzzles ==
+{|class="wikitable mw-collapsible" style="float:right; font-size:0.8em;"
+! Defines 
+|- 
+| <pre style="padding:4px;">
+TilePuzzleCursor
+TilePuzzleScene
+TilePuzzle
+pbTilePuzzle
+</pre>
+|}
+{{main|Mini-games}}
+This section defines the <code>pbTilePuzzle</code> method, which handles the Tile Puzzle game.
+
+
+<div style="clear:both"></div>
+== PSystem_Controls ==
+{|class="wikitable mw-collapsible" style="float:right; font-size:0.8em;"
+! Defines 
+|- 
+| <pre style="padding:4px;">
+Input
+Mouse
+</pre>
+|}
+{{main|Controls}}
+This section redefines the <code>Input</code> module, which handles the game controls and translating them from a keyboard press into an input. It also contains some mouse support.
+
+
+<div style="clear:both"></div>
+== PSystem_System ==
+{|class="wikitable mw-collapsible" style="float:right; font-size:0.8em;"
+! Defines 
+|- 
+| <pre style="padding:4px;">
+pbSafeLoad
+pbChooseLanguage
+pbSetUpSystem
+pbScreenCapture
+pbDebugF7
+</pre>
+|}
+This section defines a few small methods which set up the game.
+
+
+<div style="clear:both"></div>
+== PSystem_Utilities ==
+{|class="wikitable mw-collapsible" style="float:right; font-size:0.8em;"
+! Defines 
+|- 
+| <pre style="padding:4px;">
+LinearCongRandom
+ItemStorageHelper
+pbEachCombination
+pbGetMyDocumentsFolder
+pbGetLanguage
+toFahrenheit
+toCelsius
+pbIsJsonString
+pbParseJson
+MiniXmlReader
+pbChangePlayer
+pbGetPlayerGraphic
+pbTrainerName
+pbSuggestTrainerName
+pbGetUserName
+getRandomName
+pbTimeEvent
+pbTimeEventValid
+isConst?
+getConst
+getID
+pbFadeOutInWithMusic
+getWaveDataUI
+beginRecordUI
+pbHideVisibleObjects
+pbLoadRpgxpScene
+pbCommonEvent
+pbPokemonBitmapFile
+pbLoadPokemonBitmap
+pbLoadPokemonBitmapSpecies
+pbLoadSpeciesBitmap
+pbLoadPokemonIcon
+pbPokemonIconFile
+pbItemIconFile
+pbTrainerCharFile
+pbTrainerSpriteFile
+pbPlayerSpriteFile
+pbResolveAudioSE
+pbCryFrameLength
+pbPlayCry
+pbGetWildBattleBGM
+pbGetTrainerBattleBGM
+pbGetTrainerVictoryME
+pbNickname
+pbStorePokemon
+pbNicknameAndStore
+pbAddPokemon
+pbAddPokemonSilent
+pbAddToParty
+pbAddForeignPokemon
+pbGenerateEgg
+pbSeenForm
+pbHealAll
+pbAllFainted
+pbBalancedLevel
+pbSize
+pbHasEgg?
+pbChoosePokemon
+pbChooseAblePokemon
+pbChoosePokemonForTrade
+pbHasSpecies?
+pbHasFatefulSpecies?
+pbCheckMove
+pbGetRegionalNumber
+pbGetCurrentRegion
+pbGetNationalNumber
+pbUnlockDex
+pbTextEntry
+pbMoveTutorChoose
+pbChooseMove
+pbPokemonScreen
+pbSaveScreen
+pbRecordTrainer
+</pre>
+|}
+This section contains a number of extra methods that don't fit elsewhere. These include:
+
+* Methods that gather information from the player's computer.
+* The <code>LinearCongRandom</code> class, which is an implementation of the RNG system used by the actual pokemon core series (but is unused in Essentials by default).
+* Methods to parse JSON and XML.
+* Convenience methods to define and name the player character, or get information about the player character.
+* Various utility methods, including those for Event timing and getting Constants.
+** <code>pbGet</code> and <code>pbSet</code>: the preferred way to get and set global variables.
+** <code>pbExclaim</code> and <code>pbNoticePlayer</code>: used for events that spot the player at a distance.
+** Methods that load Pokémon sprites and icons.
+** Various sound- and music-related methods.
+** Methods that add Pokémon in various ways, and stores/nicknames them.
+* The <code>pbCreatePokemon</code> method, which generates the Demo Party available from the Debug menu.
+* Methods involved with party manipulation.
+* A method that calculates a balanced version of a given party of Pokémon.
+* Methods that let the player choose a Pokémon from their party.
+* Methods that check if a pokemon in the player's party has a move.
+* Methods that return the Regional/National Dex numbers of a species, and one that compiles a Regional Dex list.
+* Move Tutor methods.
+
+
+
+<div style="clear:both"></div>
+== Debug ==
+{|class="wikitable mw-collapsible" style="float:right; font-size:0.8em;"
+! Defines 
+|- 
+| <pre style="padding:4px;">
+PokemonDataCopy
+PokemonDataWrapper
+CommandList
+Scene_Debug
+pbMapTree
+pbCompileTextUI
+pbWarpToMap
+pbDebugMenu
+pbDebugScreen
+pbDebugSetVariable
+</pre>
+|}
+{{main|Debug mode}}
+This section defines the <code>pbDebugMenu</code> methods, which defines the Debug menu that can be accessed from the [[Pause menu]].
+
+
+<div style="clear:both"></div>
+== TilesetEditor ==
+{|class="wikitable mw-collapsible" style="float:right; font-size:0.8em;"
+! Defines 
+|- 
+| <pre style="padding:4px;">
+pbTilesetWrapper
+PokemonTilesetScene
+pbTilesetScreen
+</pre>
+|}
+This section handles the [[Debug mode]] option that allows you to change the [[Tilesets|terrain tags]] of tiles in a tileset.
+
+
+<div style="clear:both"></div>
+== BattleAnimationsEditor ==
+{|class="wikitable mw-collapsible" style="float:right; font-size:0.8em;"
+! Defines 
+|- 
+| <pre style="padding:4px;">
+Window_Menu
+UIControl
+Label
+Button
+Checkbox
+TextField
+Slider
+OptionalSlider
+TextSlider
+OptionalTextSlider
+ControlWindow
+Clipboard
+AnimationWindow
+SpriteFrame
+AnimationCanvas
+pbSpriteHitTest
+pbTrackPopupMenu
+pbChooseNum
+pbSetTone
+pbCellProperties
+pbTimingList
+pbSelectAnim
+pbAnimationsOrganiser
+</pre>
+|}
+{{main|Attack animations}}
+This section defines dozens of UI classes and methods that are used in the Animation Editor, which is used for creating animations of moves being used in battle.
+
+
+<div style="clear:both"></div>
+== Editor ==
+{|class="wikitable mw-collapsible" style="float:right; font-size:0.8em;"
+! Defines 
+|- 
+| <pre style="padding:4px;">
+GraphicsLister
+MusicFileLister
+MapScreenScene
+MapLister
+ItemLister
+TrainerTypeLister
+TrainerBattleLister
+LimitProperty
+ReadOnlyProperty
+BooleanProperty
+BGMProperty
+TypeProperty
+NatureProperty
+PlayerProperty
+MapProperty
+pbIsOldSpecialType?
+MakeshiftConsts.get
+pbSavePokemonData
+pbSaveItems
+pbSaveTrainerTypes
+pbSaveTownMap
+pbSavePhoneData
+pbSaveBTTrainers
+pbFastInspect
+pbSaveAllData
+pbChooseSpecies
+pbChooseItemList
+pbCommands3
+pbListScreen
+pbPropertyList
+pbEncounterEditorMap
+pbTrainerTypeEditor
+createRegionMap
+pbEditorScreen
+</pre>
+|}
+{{main|Debug mode}}
+This section defines many UI elements to handle the in-game Debug Mode editors, allowing you to edit the contents of some of the [[PBS file]]s.
+
+
+<div style="clear:both"></div>
+== Compiler ==
+{|class="wikitable mw-collapsible" style="float:right; font-size:0.8em;"
+! Defines 
+|- 
+| <pre style="padding:4px;">
+FileLineData
+TrainerChecker
+pbPrintException
+pbEachFileSectionEx
+pbCheckByte
+csvfield!
+pbGetCsvRecord
+pbGetConst
+parseTrainer
+pbAddScript
+pbWriteDefaultTypes
+pbCompileTypes
+pbCompileConnections
+pbCompileItems
+pbCompilePokemonData
+pbCompileMachines
+pbCompileTrainers
+pbCompileMetadata
+pbCompileAnimations
+pbUpdateDoor
+pbCompileAllData
+</pre>
+|}
+This section handles the compiling of all information in the [[PBS file]]s into a set of data the game can actually use.
+
+Note: This section defines <code>pbFixEventUse</code>, which is responsible for going through your maps and events and fixing many minor common errors developers make in their coding, including things like replacing door transfers with properly done door events, normalizing the use of "\b" and "\r" in text, replacing "pbItemBall" with "pbReceiveItem" on non-item events, deleting superfluous exit commands, etc.
+
+This section also defines <code>pbConvertToItemEvent</code>, which will turn a simple events named a certain way into full item ball events. For example, if you make a new event simply named "Item:POTION" or "HiddenItem:POTION", the compile will turn the event into a full Item Ball or Hidden Item event which will give the player one potion.
+
+This section also defines <code>pbConvertToTrainerEvent</code>, which will turn an event into a trainer, as outlined by [[Trainers#Setting_up_a_trainer_event|the Trainers page]].
+
+Basically, if something changes in your project after you do a test run of your game without your doing it (for better or worse), it is likely the fault of the Compiler script section.
+
+
+
+<div style="clear:both"></div>
+== Main ==
+This section defines the entry point of the game. It is what starts the game running and brings up the title screen. '''This section must always be the last script section.''' 
+
+If you are adding any extensions to the game from a tutorial on this wiki or a thread in the community forum, they will more often than not tell you to place it right above this section. This is because scripts placed lower will override scripts placed in higher script sections, but scripts placed below Main will never run, as Main is where the main game loop runs.
+
+
+
+<div style="clear:both"></div>
+== Compiled Scripts ==
+There are some classes and methods which are not defined in script sections, but are compiled directly from from PBS files by the Compiler. The following are classes you won't find defined in the Script Editor. All of these classes simply enumerate their values. They don't have any logic, but they'll usually have a method to get the printable name of the enum.
+
+=== PBTypes ===
+This is the list of types, defined in types.txt. The script compiles to the following, from the unmodified example project:
+
+  class PBTypes
+    NORMAL=0
+    #[...all defined types...]
+    DARK=17
+    def PBTypes.getName(id)
+      return pbGetMessage(MessageTypes::Types,id)
+    end
+    def PBTypes.getCount; return 18; end
+    def PBTypes.maxValue; return 17; end
+  end
+
+=== PBAbilities ===
+This is the list of all abilities, defined in abilities.txt. The script compiles to the following, from the unmodified example project:
+
+  class PBAbilities
+    STENCH=1
+    #[...all defined abilities...]
+    TERAVOLT=164
+
+    def PBAbilities.getName(id)
+      return pbGetMessage(MessageTypes::Abilities,id)
+    end
+    def PBAbilities.getCount
+      return 164
+    end
+    
+    def PBAbilities.maxValue
+      return 164
+    end
+  end
+
+=== PBMoves ===
+This is a list of all moves, defined in moves.txt. The script compiles to the following, from the unmodified example project:
+
+  class PBMoves
+    MEGAHORN=1
+    #[...all defined moves...]
+    WITHDRAW=559
+    
+    def PBMoves.getName(id)
+      return pbGetMessage(MessageTypes::Moves,id)
+    end
+    def PBMoves.getCount
+      return 559
+    end
+    def PBMoves.maxValue
+      return 559
+    end
+  end
+
+=== PBItems ===
+This is a list of all items, defined in items.txt. The script compiles to the following, from the unmodified example project:
+
+  class PBItems
+    REPEL=1
+    #[...all defined items...]
+    SHINYCHARM=525
+
+    def PBItems.getName(id)
+      return pbGetMessage(MessageTypes::Items,id)
+    end
+
+    def PBItems.getNamePlural(id)
+      return pbGetMessage(MessageTypes::ItemPlurals,id)
+    end
+
+    def PBItems.getCount
+      return 525
+    end
+
+    def PBItems.maxValue
+      return 525
+    end
+  end
+
+=== PBSpecies ===
+This is the list of pokemon species, defined from pokemon.txt. Note that the PBSpecies enum corresponds to the national pokedex number of the pokemon species, and thus you can use PBSpecies::QUILAVA as a constant for Quilava's national dex number. The script compiles to the following, from the unmodified example project:
+
+  module PBSpecies
+    BULBASAUR=1
+    IVYSAUR=2
+    #[...all defined pokemon...]
+    MELOETTA=648
+    GENESECT=649
+    def PBSpecies.getName(id)
+      return pbGetMessage(MessageTypes::Species,id)
+    end
+    def PBSpecies.getCount
+      return 649
+    end
+    def PBSpecies.maxValue
+      return 649
+    end
+  end
+
+=== PBTrainers ===
+This is a list of all trainer types, defined in trainertypes.txt. The script compiles to the following, from the unmodified example project:
+
+  class PBTrainers
+    POKEMONTRAINER_Red=0
+    #[...all defined trainer types...]
+    CHAMPION=71
+
+    def PBTrainers.getName(id)
+      return pbGetMessage(MessageTypes::TrainerTypes,id)
+    end
+    def PBTrainers.getCount
+      return 72
+    end
+    def PBTrainers.maxValue
+      return 71
+    end
+  end
+
+
+
