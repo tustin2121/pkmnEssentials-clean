@@ -47,6 +47,7 @@ HealingSpot=8,17,11
 # Cedolan Gym
 BattleBack=IndoorB
 MapPosition=0,13,10
+DarkMap=true
 [011]
 # Pokémon Institute
 MapPosition=0,14,10
