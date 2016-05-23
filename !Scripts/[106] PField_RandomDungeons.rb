@@ -377,7 +377,7 @@ class Dungeon
 
   class DungeonTable
     def initialize(dungeon)
-	    @dungeon=dungeon
+      @dungeon=dungeon
     end
   
     def xsize; @dungeon.width; end
@@ -526,15 +526,15 @@ class Dungeon
   end
 
   def intersects?(r1,r2)
-  	return !((( r2[0] + r2[2]  <= r1[0] ) || 
-	   	 ( r2[0] >= r1[0] + r1[2] ) ||
-		   ( r2[1] + r2[3] <= r1[1] ) || 
-		   ( r2[1] >= r1[1] + r1[3] ) ) &&
-		   (( r1[0] <= r2[0] + r2[2] )||
-		   ( r1[0] >= r2[0] + r2[2] ) ||
-		   ( r1[1] + r1[3] <= r2[1] ) || 
-	   	 ( r1[1] >= r2[1] + r2[3] ))
-		);
+    return !((( r2[0] + r2[2]  <= r1[0] ) || 
+       ( r2[0] >= r1[0] + r1[2] ) ||
+       ( r2[1] + r2[3] <= r1[1] ) || 
+       ( r2[1] >= r1[1] + r1[3] ) ) &&
+       (( r1[0] <= r2[0] + r2[2] )||
+       ( r1[0] >= r2[0] + r2[2] ) ||
+       ( r1[1] + r1[3] <= r2[1] ) || 
+       ( r1[1] >= r2[1] + r2[3] ))
+    );
   end
 end
 

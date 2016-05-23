@@ -1,3 +1,29 @@
+class PokeBattle_NullBattlePeer
+  def pbOnEnteringBattle(battle,pokemon)
+  end
+
+  def pbStorePokemon(player,pokemon)
+    if player.party.length<6
+      player.party[player.party.length]=pokemon
+    end
+    return -1
+  end
+
+  def pbGetStorageCreator()
+    return nil
+  end
+
+  def pbCurrentBox()
+    return -1
+  end
+
+  def pbBoxName(box)
+    return ""
+  end
+end
+
+
+
 class PokeBattle_RealBattlePeer
   def pbStorePokemon(player,pokemon)
     if player.party.length<6

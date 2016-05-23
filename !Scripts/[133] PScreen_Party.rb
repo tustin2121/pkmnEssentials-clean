@@ -777,6 +777,8 @@ class PokemonScreen_Scene
     for i in 0...6
       if annot
         @sprites["pokemon#{i}"].text=annot[i]
+      else
+        @sprites["pokemon#{i}"].text=nil
       end
     end
   end
@@ -1176,6 +1178,10 @@ class PokemonScreen
       annot.push(elig ? _INTL("ABLE") : _INTL("NOT ABLE"))
     end
     @scene.pbAnnotate(annot)
+  end
+
+  def pbClearAnnotations
+    @scene.pbAnnotate(nil)
   end
 
   def pbPokemonDebug(pkmn,pkmnid)
@@ -1812,34 +1818,34 @@ class PokemonScreen
       pkmnid=@scene.pbChoosePokemon
       break if pkmnid<0
       pkmn=@party[pkmnid]
-      commands=[]
-      cmdSummary=-1
-      cmdDebug=-1
-      cmdMoves=[-1,-1,-1,-1]
-      cmdSwitch=-1
-      cmdMail=-1
-      cmdItem=-1
+      commands   = []
+      cmdSummary = -1
+      cmdDebug   = -1
+      cmdMoves   = [-1,-1,-1,-1]
+      cmdSwitch  = -1
+      cmdMail    = -1
+      cmdItem    = -1
       # Build the commands
-      commands[cmdSummary=commands.length]=_INTL("Summary")
-      commands[cmdDebug=commands.length]=_INTL("Debug") if $DEBUG
+      commands[cmdSummary=commands.length]      = _INTL("Summary")
+      commands[cmdDebug=commands.length]        = _INTL("Debug") if $DEBUG
       for i in 0...pkmn.moves.length
         move=pkmn.moves[i]
         # Check for hidden moves and add any that were found
         if !pkmn.isEgg? && (isConst?(move.id,PBMoves,:MILKDRINK) ||
                             isConst?(move.id,PBMoves,:SOFTBOILED) ||
                             HiddenMoveHandlers.hasHandler(move.id))
-          commands[cmdMoves[i]=commands.length]=PBMoves.getName(move.id)
+          commands[cmdMoves[i]=commands.length] = PBMoves.getName(move.id)
         end
       end
-      commands[cmdSwitch=commands.length]=_INTL("Switch") if @party.length>1
+      commands[cmdSwitch=commands.length]       = _INTL("Switch") if @party.length>1
       if !pkmn.isEgg?
         if pkmn.mail
-          commands[cmdMail=commands.length]=_INTL("Mail")
+          commands[cmdMail=commands.length]     = _INTL("Mail")
         else
-          commands[cmdItem=commands.length]=_INTL("Item")
+          commands[cmdItem=commands.length]     = _INTL("Item")
         end
       end
-      commands[commands.length]=_INTL("Cancel")
+      commands[commands.length]                 = _INTL("Cancel")
       command=@scene.pbShowCommands(_INTL("Do what with {1}?",pkmn.name),commands)
       havecommand=false
       for i in 0...4
@@ -1847,7 +1853,8 @@ class PokemonScreen
           havecommand=true
           if isConst?(pkmn.moves[i].id,PBMoves,:SOFTBOILED) ||
              isConst?(pkmn.moves[i].id,PBMoves,:MILKDRINK)
-            if pkmn.hp<=(pkmn.totalhp/5).floor
+            amt=[(pkmn.totalhp/5).floor,1].max
+            if pkmn.hp<=amt
               pbDisplay(_INTL("Not enough HP..."))
               break
             end
@@ -1865,12 +1872,12 @@ class PokemonScreen
               elsif newpkmn.hp==0 || newpkmn.hp==newpkmn.totalhp
                 pbDisplay(_INTL("{1} can't be used on that Pokémon.",PBMoves.getName(pkmn.moves[i].id)))
               else
-                pkmn.hp-=(pkmn.totalhp/5).floor
-                hpgain=pbItemRestoreHP(newpkmn,(pkmn.totalhp/5).floor)
+                pkmn.hp-=amt
+                hpgain=pbItemRestoreHP(newpkmn,amt)
                 @scene.pbDisplay(_INTL("{1}'s HP was restored by {2} points.",newpkmn.name,hpgain))
                 pbRefresh
               end
-              break if pkmn.hp<=(pkmn.totalhp/5).floor
+              break if pkmn.hp<=amt
             end
             break
           elsif Kernel.pbCanUseHiddenMove?(pkmn,pkmn.moves[i].id)
@@ -1918,17 +1925,17 @@ class PokemonScreen
           pbRefreshSingle(pkmnid)
         end
       elsif cmdItem>=0 && command==cmdItem
-        itemcommands=[]
-        cmdUseItem=-1
-        cmdGiveItem=-1
-        cmdTakeItem=-1
-        cmdMoveItem=-1
+        itemcommands = []
+        cmdUseItem   = -1
+        cmdGiveItem  = -1
+        cmdTakeItem  = -1
+        cmdMoveItem  = -1
         # Build the commands
-        itemcommands[cmdUseItem=itemcommands.length]=_INTL("Use")
-        itemcommands[cmdGiveItem=itemcommands.length]=_INTL("Give")
-        itemcommands[cmdTakeItem=itemcommands.length]=_INTL("Take") if pkmn.hasItem?
-        itemcommands[cmdMoveItem=itemcommands.length]=_INTL("Move") if pkmn.hasItem? && !pbIsMail?(pkmn.item)
-        itemcommands[itemcommands.length]=_INTL("Cancel")
+        itemcommands[cmdUseItem=itemcommands.length]  = _INTL("Use")
+        itemcommands[cmdGiveItem=itemcommands.length] = _INTL("Give")
+        itemcommands[cmdTakeItem=itemcommands.length] = _INTL("Take") if pkmn.hasItem?
+        itemcommands[cmdMoveItem=itemcommands.length] = _INTL("Move") if pkmn.hasItem? && !pbIsMail?(pkmn.item)
+        itemcommands[itemcommands.length]             = _INTL("Cancel")
         command=@scene.pbShowCommands(_INTL("Do what with an item?"),itemcommands)
         if cmdUseItem>=0 && command==cmdUseItem   # Use
           item=@scene.pbUseItem($PokemonBag,pkmn)

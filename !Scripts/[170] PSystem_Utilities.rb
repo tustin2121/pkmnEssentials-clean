@@ -1987,10 +1987,11 @@ def pbBalancedLevel(party)
   mean/=weightSum
   # Round to nearest number
   mean=mean.round
+  # Adjust level to minimum
+  mean=1 if mean<1
   # Add 2 to the mean to challenge the player
   mean+=2
-  # Adjust level to minimum and maximum
-  mean=1 if mean<1
+  # Adjust level to maximum
   mean=PBExperience::MAXLEVEL if mean>PBExperience::MAXLEVEL
   return mean
 end
@@ -2131,8 +2132,7 @@ def pbChoosePokemonForTrade(variableNumber,nameVarNumber,wanted)
      if wanted.is_a?(String) || wanted.is_a?(Symbol)
        wanted=getID(PBSpecies,wanted)
      end
-     return !poke.isEgg? && !(poke.isShadow? rescue false) &&
-            isConst?(poke.species,PBSpecies,wanted)
+     return !poke.isEgg? && !(poke.isShadow? rescue false) && poke.species==wanted
   })
 end
 

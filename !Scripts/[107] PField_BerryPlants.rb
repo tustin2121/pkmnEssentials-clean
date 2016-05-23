@@ -7,7 +7,8 @@ class PokemonTemp
          @berryPlantData=Marshal.load(f)
       }
     end
-    return @berryPlantData[item]
+    return @berryPlantData[item] if @berryPlantData && @berryPlantData[item]!=nil
+    return [3,15,2,5] # Hours/stage, drying/hour, min yield, max yield
   end
 end
 
@@ -32,6 +33,9 @@ class BerryPlantMoistureSprite
     @event=event
     @map=map
     @light = IconSprite.new(0,0,viewport)
+    @light.ox=16
+    @light.oy=24
+    @oldmoisture=-1   # -1=none, 0=dry, 1=damp, 2=wet
     updateGraphic
     @disposed=false
   end
@@ -48,27 +52,30 @@ class BerryPlantMoistureSprite
   end
 
   def updateGraphic
-    if @event.variable && @event.variable.length>6
-      if @event.variable[1]<=0
-        @light.setBitmap("")
-      elsif @event.variable[4]>50
-        @light.setBitmap("Graphics/Characters/berrytreeWet")
-      elsif @event.variable[4]>0
-        @light.setBitmap("Graphics/Characters/berrytreeDamp")
-      else
-        @light.setBitmap("Graphics/Characters/berrytreeDry")
-      end
-    else
+    case @oldmoisture
+    when -1
       @light.setBitmap("")
+    when 0
+      @light.setBitmap("Graphics/Characters/berrytreeDry")
+    when 1
+      @light.setBitmap("Graphics/Characters/berrytreeDamp")
+    when 2
+      @light.setBitmap("Graphics/Characters/berrytreeWet")
     end
   end
 
   def update
     return if !@light || !@event
+    newmoisture=-1
+    if @event.variable && @event.variable.length>6 && @event.variable[1]>0
+      # Berry was planted, show moisture patch
+      newmoisture=(@event.variable[4]>50) ? 2 : (@event.variable[4]>0) ? 1 : 0
+    end
+    if @oldmoisture!=newmoisture
+      @oldmoisture=newmoisture
+      updateGraphic
+    end
     @light.update
-    updateGraphic
-    @light.ox=16
-    @light.oy=24
     if (Object.const_defined?(:ScreenPosHelper) rescue false)
       @light.x = ScreenPosHelper.pbScreenX(@event)
       @light.y = ScreenPosHelper.pbScreenY(@event)
@@ -86,7 +93,6 @@ end
 
 
 class BerryPlantSprite
-  DEFAULTBERRYVALUES = [3,15,2,5] # Hours/stage, drying/hour, min yield, max yield
   REPLANTS = 9
 
   def initialize(event,map,viewport)
@@ -99,8 +105,8 @@ class BerryPlantSprite
     @oldstage=berryData[0]
     @event.character_name=""
     berryData=updatePlantDetails(berryData)
-    setGraphic(berryData,true)     # Set the event's graphic
-    event.setVariable(berryData)   # Set new berry data
+    setGraphic(berryData,true)      # Set the event's graphic
+    @event.setVariable(berryData)   # Set new berry data
   end
 
   def dispose
@@ -118,120 +124,118 @@ class BerryPlantSprite
     if berryData
       berryData=updatePlantDetails(berryData) if berryData.length>6
       setGraphic(berryData)
+      @event.setVariable(berryData)
     end
   end
 
   def updatePlantDetails(berryData)
+    return berryData if berryData[0]==0
     berryvalues=$PokemonTemp.pbGetBerryPlantData(berryData[1])
-    berryvalues=DEFAULTBERRYVALUES if !berryvalues # Default values
-    timeperstage=berryvalues[0]
+    timeperstage=berryvalues[0]*3600
+    timenow=pbGetTimeNow
     if berryData.length>6
       # Gen 4 growth mechanisms
-      if berryData[0]>0
-        dryingrate=berryvalues[1]
-        timeperstage*=3600
-        if hasConst?(PBItems,:GROWTHMULCH) && isConst?(berryData[7],PBItems,:GROWTHMULCH)
-          timeperstage=(timeperstage*0.75).to_i
-          dryingrate=(dryingrate*1.5).ceil
-        elsif hasConst?(PBItems,:DAMPMULCH) && isConst?(berryData[7],PBItems,:DAMPMULCH)
-          timeperstage=(timeperstage*1.25).to_i
-          dryingrate=(dryingrate/2).floor
+      # Check time elapsed since last check
+      timeDiff=(timenow.to_i-berryData[3])   # in seconds
+      return berryData if timeDiff<=0
+      berryData[3]=timenow.to_i   # last updated now
+      # Mulch modifiers
+      dryingrate=berryvalues[1]
+      maxreplants=REPLANTS
+      ripestages=4
+      if isConst?(berryData[7],PBItems,:GROWTHMULCH)
+        timeperstage=(timeperstage*0.75).to_i
+        dryingrate=(dryingrate*1.5).ceil
+      elsif isConst?(berryData[7],PBItems,:DAMPMULCH)
+        timeperstage=(timeperstage*1.25).to_i
+        dryingrate=(dryingrate*0.5).floor
+      elsif isConst?(berryData[7],PBItems,:GOOEYMULCH)
+        maxreplants=(maxreplants*1.5).ceil
+      elsif isConst?(berryData[7],PBItems,:STABLEMULCH)
+        ripestages=6
+      end
+      # Cycle through all replants since last check
+      loop do
+        secondsalive=berryData[2]
+        growinglife=(berryData[5]>0) ? 3 : 4 # number of growing stages
+        numlifestages=growinglife+ripestages # number of growing + ripe stages
+        # Should replant itself?
+        if secondsalive+timeDiff>=timeperstage*numlifestages
+          # Should replant
+          if berryData[5]>=maxreplants   # Too many replants
+            return [0,0,0,0,0,0,0,0]
+          end
+          # Replant
+          berryData[0]=2   # replants start in sprouting stage
+          berryData[2]=0   # seconds alive
+          berryData[5]+=1  # add to replant count
+          berryData[6]=0   # yield penalty
+          timeDiff-=(timeperstage*numlifestages-secondsalive)
+        else
+          break
         end
-        # Get time elapsed since last check
-        timenow=pbGetTimeNow
-        timeDiff=(timenow.to_i-berryData[3]) # in seconds
-        return berryData if timeDiff<=0
-        berryData[3]=timenow.to_i # last updated now
-        hasreplanted=true
-        while hasreplanted
-          hasreplanted=false
-          secondsalive=berryData[2]
-          # Should replant itself?
-          growinglife=(berryData[5]>0) ? 3 : 4 # number of growing stages
-          numlifestages=growinglife+4 # number of growing + ripe stages
-          numlifestages+=2 if hasConst?(PBItems,:STABLEMULCH) &&
-                               isConst?(berryData[7],PBItems,:STABLEMULCH)
-          if secondsalive+timeDiff>=timeperstage*numlifestages
-            # Should replant
-            # Has it been replanted too many times already?
-            replantmult=1
-            replantmult=1.5 if hasConst?(PBItems,:GOOEYMULCH) &&
-                               isConst?(berryData[7],PBItems,:GOOEYMULCH)
-            if berryData[5]>=(REPLANTS*replantmult).ceil   # Too many replants
-              berryData=nil
-              break
-            end
-            # Replant
-            berryData[0]=2   # replants start in sprouting stage
-            berryData[2]=0   # seconds alive
-            berryData[5]+=1  # add to replant count
-            berryData[6]=0   # yield penalty
-            timeDiff-=(timeperstage*numlifestages-secondsalive)
-            hasreplanted=true
+      end
+      # Update current stage and dampness
+      if berryData[0]>0
+        # Advance growth stage
+        oldlifetime=berryData[2]
+        newlifetime=oldlifetime+timeDiff
+        if berryData[0]<5
+          berryData[0]=1+(newlifetime/timeperstage).floor
+          berryData[0]+=1 if berryData[5]>0   # replants start at stage 2
+          berryData[0]=5 if berryData[0]>5
+        end
+        # Update the "seconds alive" counter
+        berryData[2]=newlifetime
+        # Reduce dampness, apply yield penalty if dry
+        growinglife=(berryData[5]>0) ? 3 : 4 # number of growing stages
+        oldhourtick=(oldlifetime/3600).floor
+        newhourtick=(([newlifetime,timeperstage*growinglife].min)/3600).floor
+        (newhourtick-oldhourtick).times do
+          if berryData[4]>0
+            berryData[4]=[berryData[4]-dryingrate,0].max
           else
-            # Reduce dampness, apply yield penalty if dry
-            oldhourtick=(secondsalive/3600).floor
-            newhourtick=(([secondsalive+timeDiff,timeperstage*growinglife].min)/3600).floor
-            (newhourtick-oldhourtick).times do
-              if berryData[4]>0
-                berryData[4]=[berryData[4]-dryingrate,0].max
-              else
-                berryData[6]+=1
-              end
-            end
-            # Advance growth stage
-            if secondsalive+timeDiff>=timeperstage*growinglife
-              berryData[0]=5
-            else
-              berryData[0]=1+((secondsalive+timeDiff)/timeperstage).floor
-              berryData[0]+=1 if berryData[0]<5 && berryData[5]>0 # replants start at stage 2
-            end
-            # Update the "seconds alive" counter
-            berryData[2]+=timeDiff
-            break
+            berryData[6]+=1
           end
         end
       end
     else
       # Gen 3 growth mechanics
       loop do
-        break if berryData[0]==0
-        levels=0
         if berryData[0]>0 && berryData[0]<5
+          levels=0
           # Advance time
-          timenow=pbGetTimeNow
           timeDiff=(timenow.to_i-berryData[3]) # in seconds
-          if timeDiff>=timeperstage*3600
-           levels+=1
-          end
-          if timeDiff>=timeperstage*2*3600
+          if timeDiff>=timeperstage
             levels+=1
-          end
-          if timeDiff>=timeperstage*3*3600
-            levels+=1
-          end
-          if timeDiff>=timeperstage*4*3600
-            levels+=1
+            if timeDiff>=timeperstage*2
+              levels+=1
+              if timeDiff>=timeperstage*3
+                levels+=1
+                if timeDiff>=timeperstage*4
+                  levels+=1
+                end
+              end
+            end
           end
           levels=5-berryData[0] if levels>5-berryData[0]
           break if levels==0
-          berryData[2]=false
-          berryData[3]+=levels*timeperstage*3600
-          berryData[0]+=levels
+          berryData[2]=false                  # not watered this stage
+          berryData[3]+=levels*timeperstage   # add to time existed
+          berryData[0]+=levels                # increase growth stage
           berryData[0]=5 if berryData[0]>5
         end
         if berryData[0]>=5
           # Advance time
-          timenow=pbGetTimeNow
-          timeDiff=(timenow.to_i-berryData[3]) # in seconds
-          if timeDiff>=timeperstage*3600*4 # ripe for 4 times as long as a stage
+          timeDiff=(timenow.to_i-berryData[3])   # in seconds
+          if timeDiff>=timeperstage*4   # ripe for 4 times as long as a stage
             # Replant
-            berryData[0]=2 # restarts in sprouting stage
-            berryData[2]=false
-            berryData[3]+=timeperstage*4*3600
-            berryData[4]=0
+            berryData[0]=2                      # replants start at stage 2
+            berryData[2]=false                  # not watered this stage
+            berryData[3]+=timeperstage*4        # add to time existed
+            berryData[4]=0                      # reset total waterings count
             berryData[5]+=1                     # add to replanted count
-            if berryData[5]>REPLANTS            # Too many replants
+            if berryData[5]>REPLANTS   # Too many replants
               berryData=[0,0,false,0,0,0]
               break
             end
@@ -240,6 +244,7 @@ class BerryPlantSprite
           end
         end
       end
+      # Check auto-watering
       if berryData[0]>0 && berryData[0]<5
         # Reset watering
         if $game_screen && 
@@ -258,29 +263,33 @@ class BerryPlantSprite
   end
 
   def setGraphic(berryData,fullcheck=false)
-    return if !berryData
-    if berryData[0]==0
+    return if !berryData || (@oldstage==berryData[0] && !fullcheck)
+    case berryData[0]
+    when 0
       @event.character_name=""
-    elsif berryData[0]==1                     # X planted
+    when 1
       @event.character_name="berrytreeplanted"   # Common to all berries
       @event.turn_down
-    elsif fullcheck || berryData.length>6
+    else
       filename=sprintf("berrytree%s",getConstantName(PBItems,berryData[1])) rescue nil
       filename=sprintf("berrytree%03d",berryData[1]) if !pbResolveBitmap("Graphics/Characters/"+filename)
       if pbResolveBitmap("Graphics/Characters/"+filename)
         @event.character_name=filename
-        @event.turn_down if berryData[0]==2   # X sprouted
-        @event.turn_left if berryData[0]==3   # X taller
-        @event.turn_right if berryData[0]==4  # X flowering
-        @event.turn_up if berryData[0]==5     # X berries
+        case berryData[0]
+        when 2; @event.turn_down    # X sprouted
+        when 3; @event.turn_left    # X taller
+        when 4; @event.turn_right   # X flowering
+        when 5; @event.turn_up      # X berries
+        end
       else
         @event.character_name="Object ball"
       end
-      if @oldstage!=berryData[0] && berryData.length>6
+      if @oldstage!=berryData[0] && berryData.length>6   # Gen 4 growth mechanisms
         $scene.spriteset.addUserAnimation(PLANT_SPARKLE_ANIMATION_ID,@event.x,@event.y) if $scene.spriteset
-        @oldstage=berryData[0]
       end
     end
+    @oldstage=berryData[0]
+p "here",berryData,@oldstage if Input.trigger?(Input::CTRL)
   end
 end
 
@@ -290,6 +299,7 @@ def pbBerryPlant
   interp=pbMapInterpreter
   thisEvent=interp.get_character(0)
   berryData=interp.getVariable
+p berryData if Input.trigger?(Input::CTRL)
   if !berryData
     if NEWBERRYPLANTS
       berryData=[0,0,0,0,0,0,0,0]
@@ -299,22 +309,18 @@ def pbBerryPlant
   end
   # Stop the event turning towards the player
   case berryData[0]
-  when 1  # X planted
-    thisEvent.turn_down
-  when 2  # X sprouted
-    thisEvent.turn_down
-  when 3  # X taller
-    thisEvent.turn_left
-  when 4  # X flowering
-    thisEvent.turn_right
-  when 5  # X berries
-    thisEvent.turn_up
+  when 1; thisEvent.turn_down  # X planted
+  when 2; thisEvent.turn_down  # X sprouted
+  when 3; thisEvent.turn_left  # X taller
+  when 4; thisEvent.turn_right  # X flowering
+  when 5; thisEvent.turn_up  # X berries
   end
   watering=[]
-  watering.push(getConst(PBItems,:SPRAYDUCK)) if hasConst?(PBItems,:SPRAYDUCK)
-  watering.push(getConst(PBItems,:SQUIRTBOTTLE)) if hasConst?(PBItems,:SQUIRTBOTTLE)
-  watering.push(getConst(PBItems,:WAILMERPAIL)) if hasConst?(PBItems,:WAILMERPAIL)
-  watering.push(getConst(PBItems,:SPRINKLOTAD)) if hasConst?(PBItems,:SPRINKLOTAD)
+  watering.push(getConst(PBItems,:SPRAYDUCK))
+  watering.push(getConst(PBItems,:SQUIRTBOTTLE))
+  watering.push(getConst(PBItems,:WAILMERPAIL))
+  watering.push(getConst(PBItems,:SPRINKLOTAD))
+  watering.compact!
   berry=berryData[1]
   case berryData[0]
   when 0  # empty
@@ -333,29 +339,33 @@ def pbBerryPlant
              ret=screen.pbChooseItemScreen
           }
           if ret>0
-            berryData[7]=ret if pbIsMulch?(ret)
-            Kernel.pbMessage(_INTL("The {1} was scattered on the soil.",PBItems.getName(ret)))
-            if Kernel.pbConfirmMessage(_INTL("Want to plant a Berry?"))
-              pbFadeOutIn(99999){
-                 scene=PokemonBag_Scene.new
-                 screen=PokemonBagScreen.new(scene,$PokemonBag)
-                 berry=screen.pbChooseBerryScreen
-              }
-              if berry>0
-                timenow=pbGetTimeNow
-                berryData[0]=1             # growth stage (1-5)
-                berryData[1]=berry         # item ID of planted berry
-                berryData[2]=0             # seconds alive
-                berryData[3]=timenow.to_i  # time of last checkup (now)
-                berryData[4]=100           # dampness value
-                berryData[5]=0             # number of replants
-                berryData[6]=0             # yield penalty
-                $PokemonBag.pbDeleteItem(berry,1)
-                Kernel.pbMessage(_INTL("The {1} was planted in the soft, earthy soil.",
-                   PBItems.getName(berry)))
+            if pbIsMulch?(ret)
+              berryData[7]=ret
+              Kernel.pbMessage(_INTL("The {1} was scattered on the soil.",PBItems.getName(ret)))
+              if Kernel.pbConfirmMessage(_INTL("Want to plant a Berry?"))
+                pbFadeOutIn(99999){
+                   scene=PokemonBag_Scene.new
+                   screen=PokemonBagScreen.new(scene,$PokemonBag)
+                   berry=screen.pbChooseBerryScreen
+                }
+                if berry>0
+                  timenow=pbGetTimeNow
+                  berryData[0]=1             # growth stage (1-5)
+                  berryData[1]=berry         # item ID of planted berry
+                  berryData[2]=0             # seconds alive
+                  berryData[3]=timenow.to_i  # time of last checkup (now)
+                  berryData[4]=100           # dampness value
+                  berryData[5]=0             # number of replants
+                  berryData[6]=0             # yield penalty
+                  $PokemonBag.pbDeleteItem(berry,1)
+                  Kernel.pbMessage(_INTL("The {1} was planted in the soft, earthy soil.",
+                     PBItems.getName(berry)))
+                end
               end
+              interp.setVariable(berryData)
+            else
+              Kernel.pbMessage(_INTL("That won't fertilize the soil!"))
             end
-            interp.setVariable(berryData)
             return
           end
         elsif cmd==1 # Plant Berry
@@ -455,7 +465,6 @@ def pbBerryPlant
     end
   when 5  # X berries
     berryvalues=$PokemonTemp.pbGetBerryPlantData(berryData[1])
-    berryvalues=DEFAULTBERRYVALUES if !berryvalues # Default values
     # Get berry yield (berrycount)
     berrycount=1
     if berryData.length>6

@@ -699,62 +699,50 @@ class PokemonStorageScreen
           pbBoxCommands
         else
           pokemon=@storage[selected[0],selected[1]]
-          commands=[
-             _INTL("Move"),
-             _INTL("Summary"),
-             _INTL("Withdraw"),
-             _INTL("Item"),
-             _INTL("Mark"),
-             _INTL("Release")
-          ]
-          commands.push(_INTL("Debug")) if $DEBUG
-          commands.push(_INTL("Cancel"))
           heldpoke=pbHeldPokemon
+          next if !pokemon && !heldpoke
+          commands    = []
+          cmdMove     = -1
+          cmdSummary  = -1
+          cmdWithdraw = -1
+          cmdItem     = -1
+          cmdMark     = -1
+          cmdRelease  = -1
+          cmdDebug    = -1
+          cmdCancel   = -1
           if heldpoke
             helptext=_INTL("{1} is selected.",heldpoke.name)
-            commands[0]=pokemon ? _INTL("Shift") : _INTL("Place")
+            commands[cmdMove=commands.length]   = (pokemon) ? _INTL("Shift") : _INTL("Place")
           elsif pokemon
             helptext=_INTL("{1} is selected.",pokemon.name)
-            commands[0]=_INTL("Move")
-          else
-            next
+            commands[cmdMove=commands.length]   = _INTL("Move")
           end
-          if selected[0]==-1
-            commands[2]=_INTL("Store")
-          else
-            commands[2]=_INTL("Withdraw")
-          end
+          commands[cmdSummary=commands.length]  = _INTL("Summary")
+          commands[cmdWithdraw=commands.length] = (selected[0]==-1) ? _INTL("Store") : _INTL("Withdraw")
+          commands[cmdItem=commands.length]     = _INTL("Item")
+          commands[cmdMark=commands.length]     = _INTL("Mark")
+          commands[cmdRelease=commands.length]  = _INTL("Release")
+          commands[cmdDebug=commands.length]    = _INTL("Debug") if $DEBUG
+          commands[cmdCancel=commands.length]   = _INTL("Cancel")
           command=pbShowCommands(helptext,commands)
-          case command
-          when 0 # Move/Shift/Place
-            if @heldpkmn && pokemon
-              pbSwap(selected)
-            elsif @heldpkmn
-              pbPlace(selected)
+          if cmdMove>=0 && command==cmdMove   # Move/Shift/Place
+            if @heldpkmn
+              (pokemon) ? pbSwap(selected) : pbPlace(selected)
             else
               pbHold(selected)
             end
-          when 1 # Summary
+          elsif cmdSummary>=0 && command==cmdSummary   # Summary
             pbSummary(selected,@heldpkmn)
-          when 2 # Withdraw
-            if selected[0]==-1
-              pbStore(selected,@heldpkmn)
-            else
-              pbWithdraw(selected,@heldpkmn)
-            end
-          when 3 # Item
+          elsif cmdWithdraw>=0 && command==cmdWithdraw   # Withdraw/Store
+            (selected[0]==-1) ? pbStore(selected,@heldpkmn) : pbWithdraw(selected,@heldpkmn)
+          elsif cmdItem>=0 && command==cmdItem   # Item
             pbItem(selected,@heldpkmn)
-          when 4 # Mark
+          elsif cmdMark>=0 && command==cmdMark   # Mark
             pbMark(selected,@heldpkmn)
-          when 5 # Release
+          elsif cmdRelease>=0 && command==cmdRelease   # Release
             pbRelease(selected,@heldpkmn)
-          when 6
-            if $DEBUG
-              pkmn=@heldpkmn ? @heldpkmn : pokemon
-              debugMenu(selected,pkmn,heldpoke)
-            else
-              next
-            end
+          elsif cmdDebug>=0 && command==cmdDebug   # Debug
+            debugMenu(selected,(@heldpkmn) ? @heldpkmn : pokemon,heldpoke)
           end
         end
       end
@@ -2335,29 +2323,29 @@ class PokemonStorageScene
       else
         textstrings.push([_INTL("No item"),85,342,2,nonbase,nonshadow])
       end
+      if pokemon.isShiny?
+        imagepos=[(["Graphics/Pictures/shiny",156,198,0,0,-1,-1])]
+        pbDrawImagePositions(overlay,imagepos)
+      end
+      typebitmap=AnimatedBitmap.new(_INTL("Graphics/Pictures/types"))
+      type1rect=Rect.new(0,pokemon.type1*28,64,28)
+      type2rect=Rect.new(0,pokemon.type2*28,64,28)
+      if pokemon.type1==pokemon.type2
+        overlay.blt(52,272,typebitmap.bitmap,type1rect)
+      else
+        overlay.blt(18,272,typebitmap.bitmap,type1rect)
+        overlay.blt(88,272,typebitmap.bitmap,type2rect)
+      end
+      drawMarkings(overlay,66,240,128,20,pokemon.markings)
     end
     pbSetSystemFont(overlay)
     pbDrawTextPositions(overlay,textstrings)
-    textstrings.clear
     if !pokemon.isEgg?
+      textstrings.clear
       textstrings.push([_INTL("Lv."),10,238,false,base,shadow])
+      pbSetSmallFont(overlay)
+      pbDrawTextPositions(overlay,textstrings)
     end
-    pbSetSmallFont(overlay)
-    pbDrawTextPositions(overlay,textstrings)
-    if pokemon.isShiny?
-      imagepos=[(["Graphics/Pictures/shiny",156,198,0,0,-1,-1])]
-      pbDrawImagePositions(overlay,imagepos)
-    end
-    typebitmap=AnimatedBitmap.new(_INTL("Graphics/Pictures/types"))
-    type1rect=Rect.new(0,pokemon.type1*28,64,28)
-    type2rect=Rect.new(0,pokemon.type2*28,64,28)
-    if pokemon.type1==pokemon.type2
-      overlay.blt(52,272,typebitmap.bitmap,type1rect)
-    else
-      overlay.blt(18,272,typebitmap.bitmap,type1rect)
-      overlay.blt(88,272,typebitmap.bitmap,type2rect)
-    end
-    drawMarkings(overlay,66,240,128,20,pokemon.markings)
     @sprites["pokemon"].setPokemonBitmap(pokemon)
     pbPositionPokemonSprite(@sprites["pokemon"],26,70)
   end

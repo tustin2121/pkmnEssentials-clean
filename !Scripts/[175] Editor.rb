@@ -19,10 +19,10 @@ module MakeshiftConsts
 
   def self.get(c,i,modname=nil)
     if !@@consts[c]
-  	  @@consts[c]=[]
+      @@consts[c]=[]
     end
     if @@consts[c][i]
-	    return @@consts[c][i]
+      return @@consts[c][i]
     end
     if modname
       v=getConstantName(modname,i) rescue nil
@@ -44,7 +44,7 @@ module MakeshiftConsts
       trconst="T_"+trconst
     end
     while @@consts[c].include?(trconst)
- 	   trconst=sprintf("%s_%03d",trconst,i)
+     trconst=sprintf("%s_%03d",trconst,i)
     end
     @@consts[c][i]=trconst
     return trconst
@@ -140,7 +140,9 @@ def pbSavePokemonData
     kind=messages.get(MessageTypes::Kinds,i)
     entry=messages.get(MessageTypes::Entries,i)
     formnames=messages.get(MessageTypes::FormNames,i)
-    pbDexDataOffset(dexdata,i,6)
+    pbDexDataOffset(dexdata,i,2)
+    ability1=dexdata.fgetw
+    ability2=dexdata.fgetw
     color=dexdata.fgetb
     habitat=dexdata.fgetb
     type1=dexdata.fgetb
@@ -159,19 +161,17 @@ def pbSavePokemonData
     for j in 0...6
       effort.push(dexdata.fgetb)
     end
-    ability1=dexdata.fgetb
-    ability2=dexdata.fgetb
+    pbDexDataOffset(dexdata,i,31)
     compat1=dexdata.fgetb
     compat2=dexdata.fgetb
     height=dexdata.fgetw
     weight=dexdata.fgetw
     pbDexDataOffset(dexdata,i,38)
     baseexp=dexdata.fgetw
-    hiddenability1=dexdata.fgetb
-    hiddenability2=dexdata.fgetb
-    hiddenability3=dexdata.fgetb
-    hiddenability4=dexdata.fgetb
-    pbDexDataOffset(dexdata,i,48)
+    hiddenability1=dexdata.fgetw
+    hiddenability2=dexdata.fgetw
+    hiddenability3=dexdata.fgetw
+    hiddenability4=dexdata.fgetw
     item1=dexdata.fgetw
     item2=dexdata.fgetw
     item3=dexdata.fgetw
@@ -185,14 +185,24 @@ def pbSavePokemonData
       pokedata.write("Type2=#{ctype2}\r\n")
     end
     pokedata.write("BaseStats=#{basestats[0]},#{basestats[1]},#{basestats[2]},#{basestats[3]},#{basestats[4]},#{basestats[5]}\r\n")
-    pokedata.write("GenderRate=AlwaysMale\r\n") if gender==0
-    pokedata.write("GenderRate=FemaleOneEighth\r\n") if gender==31
-    pokedata.write("GenderRate=Female25Percent\r\n") if gender==63
-    pokedata.write("GenderRate=Female50Percent\r\n") if gender==127
-    pokedata.write("GenderRate=Female75Percent\r\n") if gender==191
-    pokedata.write("GenderRate=FemaleSevenEighths\r\n") if gender==223
-    pokedata.write("GenderRate=AlwaysFemale\r\n") if gender==254
-    pokedata.write("GenderRate=Genderless\r\n") if gender==255
+    case gender
+    when 0
+      pokedata.write("GenderRate=AlwaysMale\r\n")
+    when 31
+      pokedata.write("GenderRate=FemaleOneEighth\r\n")
+    when 63
+      pokedata.write("GenderRate=Female25Percent\r\n")
+    when 127
+      pokedata.write("GenderRate=Female50Percent\r\n")
+    when 191
+      pokedata.write("GenderRate=Female75Percent\r\n")
+    when 223
+      pokedata.write("GenderRate=FemaleSevenEighths\r\n")
+    when 254
+      pokedata.write("GenderRate=AlwaysFemale\r\n")
+    when 255
+      pokedata.write("GenderRate=Genderless\r\n")
+    end
     pokedata.write("GrowthRate=" + ["Medium","Erratic","Fluctuating","Parabolic","Fast","Slow"][growthrate]+"\r\n")
     pokedata.write("BaseEXP=#{baseexp}\r\n")
     pokedata.write("EffortPoints=#{effort[0]},#{effort[1]},#{effort[2]},#{effort[3]},#{effort[4]},#{effort[5]}\r\n")
@@ -449,11 +459,11 @@ def pbSaveItems
        if data[ITEMMACHINE]>0
          machine=getConstantName(PBMoves,data[ITEMMACHINE]) rescue pbGetMoveConst(data[ITEMMACHINE]) rescue ""
        end
-       f.write(sprintf("%d,%s,%s,%d,%d,%s,%d,%d,%d,%s\r\n",
+       f.write(sprintf("%d,%s,%s,%s,%d,%d,%s,%d,%d,%d,%s\r\n",
           data[ITEMID],csvquote(cname),csvquote(data[ITEMNAME]),
-          data[ITEMPOCKET],data[ITEMPRICE],csvquote(data[ITEMDESC]),
-          data[ITEMUSE],data[ITEMBATTLEUSE],data[ITEMTYPE],
-          csvquote(machine)
+          csvquote(data[ITEMPLURAL]),data[ITEMPOCKET],data[ITEMPRICE],
+          csvquote(data[ITEMDESC]),data[ITEMUSE],data[ITEMBATTLEUSE],
+          data[ITEMTYPE],csvquote(machine)
        ))
      end
  }

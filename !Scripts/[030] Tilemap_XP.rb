@@ -782,7 +782,7 @@ class CustomTilemap
           for x in xrange
             xpos=(x*twidth)-@oxLayer0
             id = mapdata[x, y, z]
-            next if id==0 || @priorities[id]!=0 || !@priorities[id]
+            next if id==0 || !@priorities[id] || @priorities[id]!=0
             if id>=384
               tmprect.set( ((id - 384)&7)*@tileSrcWidth,((id - 384)>>3)*@tileSrcHeight,
                  @tileSrcWidth,@tileSrcHeight)
@@ -926,7 +926,7 @@ class CustomTilemap
     end
     if count<@tiles.length
       bigchange=(count<=(@tiles.length*2/3)) && (@tiles.length*2/3)>25
-      j=count;len=@tiles.length;while j<len
+      j=count; len=@tiles.length; while j<len
         sprite=@tiles[j]
         @tiles[j+1]=-1
         if bigchange

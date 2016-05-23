@@ -7,7 +7,7 @@ class PurifyChamberSet
   end
 
   def length
-	  return @list.length
+    return @list.length
   end
 
   def initialize
@@ -16,15 +16,15 @@ class PurifyChamberSet
   end
 
   def facing=(value)
-	  if value>=0 && value<@list.length  
-	    @facing=value
-	  end
+    if value>=0 && value<@list.length  
+      @facing=value
+    end
   end
 
   def shadow=(value)
-	  if value==nil || value.isShadow?
-		  @shadow=value
-	  end
+    if value==nil || value.isShadow?
+      @shadow=value
+    end
   end
 
 =begin
@@ -33,15 +33,15 @@ Boosted if center has advantage over facing Pokemon
 Boosted based on number of best circles
 =end
   def flow
-	  ret=0
-	  return 0 if !@shadow
-	  for i in 0...@list.length
-	    ret+=(PurifyChamberSet.isSuperEffective(@list[i],@list[(i+1)%@list.length])) ? 1 : 0
-	  end
-	  if @list[@facing]
-		  ret+=PurifyChamberSet.isSuperEffective(@shadow,@list[@facing]) ? 1 : 0
-	  end
-	  return [ret+(@list.length/2),4].min
+    ret=0
+    return 0 if !@shadow
+    for i in 0...@list.length
+      ret+=(PurifyChamberSet.isSuperEffective(@list[i],@list[(i+1)%@list.length])) ? 1 : 0
+    end
+    if @list[@facing]
+      ret+=PurifyChamberSet.isSuperEffective(@shadow,@list[@facing]) ? 1 : 0
+    end
+    return [ret+(@list.length/2),4].min
   end
 
   def shadowAffinity
@@ -57,19 +57,19 @@ Boosted based on number of best circles
 # Tempo refers to the type advantages of each Pokemon in a certain set in a
 # clockwise direction. Tempo also depends on the number of Pokemon in the set
   def tempo
-	  ret=0
-	  for i in 0...@list.length
-		  ret+=(PurifyChamberSet.isSuperEffective(@list[i],@list[(i+1)%@list.length])) ? 1 : 0
-	  end
-	  return partialSum(@list.length)+ret
+    ret=0
+    for i in 0...@list.length
+      ret+=(PurifyChamberSet.isSuperEffective(@list[i],@list[(i+1)%@list.length])) ? 1 : 0
+    end
+    return partialSum(@list.length)+ret
   end
 
   def list
-	  return @list.clone
+    return @list.clone
   end
 
   def [](index)
-	  return @list[index]
+    return @list[index]
   end
 
   def insertAfter(index,value)
@@ -239,9 +239,9 @@ class PurifyChamber # German: der Kryptorbis
     species=getID(PBSpecies,species)
     pkmn=PseudoPokemon.new(shadow,type1,type2||type1)
     if pkmn.isShadow?
- 	   self.setShadow(set,pkmn)
+     self.setShadow(set,pkmn)
     else
- 	   self.insertAfter(set,setCount(set),pkmn)
+     self.insertAfter(set,setCount(set),pkmn)
     end
   end
 end
@@ -256,7 +256,7 @@ class PokemonGlobalMetadata
     if !@purifyChamber
       @purifyChamber=PurifyChamber.new()
     end
-	  return @purifyChamber
+    return @purifyChamber
   end
 end
 
@@ -341,13 +341,13 @@ module PurifyChamberHelper
 
   def self.adjustOnInsert(position)
     if position>0
- 	    position-=1
- 	    oldpos=position/2
- 	    if position%2==0
+      position-=1
+      oldpos=position/2
+      if position%2==0
         return position+1
- 	    else
-	      return ((oldpos+1)*2)+1
-	    end
+      else
+        return ((oldpos+1)*2)+1
+      end
     end
     return position
   end
@@ -363,7 +363,7 @@ module PurifyChamberHelper
         chamber.insertAfter(chamber.currentSet,position/2,value)
       end
     end
-  end	
+  end 
 end
 
 
@@ -395,8 +395,8 @@ class PurifyChamberScreen
           @scene.pbShift(position,pkmn)
         else
           @scene.pbPlace(position,pkmn)
-	      end
-	      PurifyChamberHelper.pbSetPokemon(@chamber,position,pkmn)
+        end
+        PurifyChamberHelper.pbSetPokemon(@chamber,position,pkmn)
         @scene.pbRefresh()
       else
         @scene.pbDisplay(_INTL("Only a Shadow Pokémon can go there."))
@@ -409,8 +409,8 @@ class PurifyChamberScreen
           @scene.pbShift(position,pkmn)
         else
           @scene.pbPlace(position,pkmn)
-	      end
-	      PurifyChamberHelper.pbSetPokemon(@chamber,position,pkmn)
+        end
+        PurifyChamberHelper.pbSetPokemon(@chamber,position,pkmn)
         @scene.pbRefresh()
       else
         @scene.pbDisplay(_INTL("Can't place a Shadow Pokémon there."))
@@ -470,7 +470,7 @@ class PurifyChamberScreen
           if !heldpkmn && curpkmn
             commands[cmdReplace=commands.length]=_INTL("REPLACE")
           end
-	        commands.push(_INTL("CANCEL"))
+          commands.push(_INTL("CANCEL"))
           choice=@scene.pbShowCommands(
              _INTL("What shall I do with this {1}?",
              heldpkmn ? heldpkmn.name : curpkmn.name),commands)
@@ -479,7 +479,7 @@ class PurifyChamberScreen
               if pbPlace(heldpkmn,cmd[1]) # calls place or shift as appropriate
                 if !curpkmn
                   pbOnPlace(heldpkmn)
-			            @scene.pbPositionHint(PurifyChamberHelper.adjustOnInsert(cmd[1]))
+                  @scene.pbPositionHint(PurifyChamberHelper.adjustOnInsert(cmd[1]))
                   heldpkmn=nil # Pokemon was placed
                 else
                   heldpkmn=curpkmn # Pokemon was shifted
@@ -501,7 +501,7 @@ class PurifyChamberScreen
               $PokemonStorage.pbStoreCaught(heldpkmn)
               heldpkmn=nil
               @scene.pbRefresh()
-		        else
+            else
               # Store and delete Pokemon.
               @scene.pbWithdraw(cmd[1],heldpkmn)
               $PokemonStorage.pbStoreCaught(curpkmn)
@@ -527,7 +527,7 @@ class PurifyChamberScreen
                   @scene.pbReplace(cmd,pos)
                   PurifyChamberHelper.pbSetPokemon(@chamber,cmd[1],newpkmn)
                   $PokemonStorage[pos[0],pos[1]]=curpkmn
-    		          @scene.pbRefresh()
+                  @scene.pbRefresh()
                   pbOnPlace(curpkmn)
                 end
               end
@@ -538,7 +538,7 @@ class PurifyChamberScreen
           if pbPlacePokemon(pos,cmd[1])
             curpkmn=PurifyChamberHelper.pbGetPokemon(@chamber,cmd[1])
             pbOnPlace(curpkmn)
-		        @scene.pbPositionHint(PurifyChamberHelper.adjustOnInsert(cmd[1]))
+            @scene.pbPositionHint(PurifyChamberHelper.adjustOnInsert(cmd[1]))
           end
         end
       elsif cmd[0]==1 # Change the active set
@@ -920,7 +920,7 @@ class PurifyChamberSetView < SpriteWrapper
       if @chamber.setCount(@set)==PurifyChamber::SETSIZE
         points=[points/2,1].max
         pos/=2
-      end	 
+      end  
       seg=pos*8/points
       if seg==7 || seg==0
         pos-=1 if button==Input::LEFT
@@ -967,30 +967,30 @@ class PurifyChamberSetView < SpriteWrapper
     pbSetSmallFont(@info.bitmap)
     textpos=[]
     if pkmn
-	    if pkmn.type1==pkmn.type2
+      if pkmn.type1==pkmn.type2
         textpos.push([_INTL("{1}  Lv{2}  {3}",pkmn.name,pkmn.level,PBTypes.getName(pkmn.type1)),2,0,0,
-	         Color.new(248,248,248),Color.new(128,128,128)])
+           Color.new(248,248,248),Color.new(128,128,128)])
       else
         textpos.push([_INTL("{1}  Lv{2}  {3}/{4}",pkmn.name,pkmn.level,PBTypes.getName(pkmn.type1),
-	         PBTypes.getName(pkmn.type2)),2,0,0,
-	         Color.new(248,248,248),Color.new(128,128,128)])
+           PBTypes.getName(pkmn.type2)),2,0,0,
+           Color.new(248,248,248),Color.new(128,128,128)])
       end
       textpos.push([_INTL("FLOW"),2+@info.bitmap.width/2,24,0,
-	       Color.new(248,248,248),Color.new(128,128,128)])
-		  # draw heart gauge
-	    pbDrawGauge(@info.bitmap,Rect.new(@info.bitmap.width*3/4,8,@info.bitmap.width*1/4,8),
-	       Color.new(192,0,256),pkmn.heartgauge,
+         Color.new(248,248,248),Color.new(128,128,128)])
+      # draw heart gauge
+      pbDrawGauge(@info.bitmap,Rect.new(@info.bitmap.width*3/4,8,@info.bitmap.width*1/4,8),
+         Color.new(192,0,256),pkmn.heartgauge,
          PokeBattle_Pokemon::HEARTGAUGESIZE)
-	    # draw flow gauge
+      # draw flow gauge
       pbDrawGauge(@info.bitmap,Rect.new(@info.bitmap.width*3/4,24+8,@info.bitmap.width*1/4,8),
-	       Color.new(0,0,248),@chamber.chamberFlow(@set),6)
+         Color.new(0,0,248),@chamber.chamberFlow(@set),6)
     end
     if @chamber.setCount(@set)>0
       textpos.push([_INTL("TEMPO"),2,24,0,
-	       Color.new(248,248,248),Color.new(128,128,128)])
+         Color.new(248,248,248),Color.new(128,128,128)])
       # draw tempo gauge
       pbDrawGauge(@info.bitmap,Rect.new(@info.bitmap.width*1/4,24+8,@info.bitmap.width*1/4,8),
-	       Color.new(0,0,248),@chamber[@set].tempo,
+         Color.new(0,0,248),@chamber[@set].tempo,
          PurifyChamber.maximumTempo())
     end
     pbDrawTextPositions(@info.bitmap,textpos)

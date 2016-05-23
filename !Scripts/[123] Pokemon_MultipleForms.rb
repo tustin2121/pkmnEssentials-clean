@@ -13,9 +13,9 @@ class PokeBattle_Pokemon
 
   def form=(value)
     @form=value
+    MultipleForms.call("onSetForm",self,value)
     self.calcStats
     pbSeenForm(self)
-    MultipleForms.call("onSetForm",self,value)
   end
 
   def formNoCall=(value)
@@ -694,8 +694,7 @@ MultipleForms.register(:DARMANITAN,{
 
 MultipleForms.register(:DEERLING,{
 "getForm"=>proc{|pokemon|
-   time=pbGetTimeNow
-   next (time.month-1)%4
+   next pbGetSeason
 }
 })
 
@@ -778,10 +777,8 @@ MultipleForms.register(:KYUREM,{
 },
 "getAbilityList"=>proc{|pokemon|
    case pokemon.form
-   when 1; next [[getID(PBAbilities,:PRESSURE),0],
-                 [getID(PBAbilities,:TURBOBLAZE),2]] # White Kyurem
-   when 2; next [[getID(PBAbilities,:PRESSURE),0],
-                 [getID(PBAbilities,:TERAVOLT),2]]   # Black Kyurem
+   when 1; next [[getID(PBAbilities,:TURBOBLAZE),0]] # White Kyurem
+   when 2; next [[getID(PBAbilities,:TERAVOLT),0]]   # Black Kyurem
    else;   next                                      # Kyurem
    end
 },
@@ -816,8 +813,8 @@ MultipleForms.register(:KYUREM,{
 
 MultipleForms.register(:KELDEO,{
 "getForm"=>proc{|pokemon|
-   next 1 if pokemon.knowsMove?(:SECRETSWORD) # Resolute Form
-   next 0                                     # Ordinary Form
+   next 1 if pokemon.hasMove?(:SECRETSWORD) # Resolute Form
+   next 0                                   # Ordinary Form
 }
 })
 
@@ -864,9 +861,7 @@ MultipleForms.copy(:FLABEBE,:FLOETTE,:FLORGES)
 
 MultipleForms.register(:FURFROU,{
 "getForm"=>proc{|pokemon|
-   timenow=pbGetTimeNow
-   if pokemon.form>0 && (!pokemon.formTime ||
-                         timenow.to_i>pokemon.formTime.to_i+60*60*24*5) # 5 days
+   if !pokemon.formTime || pbGetTimeNow.to_i>pokemon.formTime.to_i+60*60*24*5 # 5 days
      next 0
    end
    next
@@ -969,9 +964,7 @@ MultipleForms.register(:XERNEAS,{
 
 MultipleForms.register(:HOOPA,{
 "getForm"=>proc{|pokemon|
-   timenow=pbGetTimeNow
-   if pokemon.form>0 && (!pokemon.formTime ||
-                         timenow.to_i>pokemon.formTime.to_i+60*60*24*3) # 3 days
+   if !pokemon.formTime || pbGetTimeNow.to_i>pokemon.formTime.to_i+60*60*24*3 # 3 days
      next 0
    end
    next

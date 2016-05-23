@@ -49,16 +49,16 @@ class WeakRef
      begin
        rids = @@id_map[id]
        if rids
-	       for rid in rids
-	         @@id_rev_map.delete(rid)
+         for rid in rids
+           @@id_rev_map.delete(rid)
          end
          @@id_map.delete(id)
        end
        rid = @@id_rev_map[id]
        if rid
-	       @@id_rev_map.delete(id)
-	       @@id_map[rid].delete(id)
-	       @@id_map.delete(rid) if @@id_map[rid].empty?
+         @@id_rev_map.delete(id)
+         @@id_map[rid].delete(id)
+         @@id_map.delete(rid) if @@id_map[rid].empty?
        end
      ensure
        Thread.critical = __old_status
@@ -205,7 +205,7 @@ end
 module RPG
   module Cache
     def self.load_bitmap(folder_name, filename, hue = 0)
-	    BitmapCache.load_bitmap(folder_name+filename.to_s,hue, true)
+      BitmapCache.load_bitmap(folder_name+filename.to_s,hue, true)
     end
 
     def self.animation(filename, hue)

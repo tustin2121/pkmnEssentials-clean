@@ -113,7 +113,11 @@ module FileLineData
 
   def self.linereport
     if @section
-      return _INTL("File {1}, section {2}, key {3}\r\n{4}\r\n",@file,@section,@key,@value)
+      if @key!=nil
+        return _INTL("File {1}, section {2}, key {3}\r\n{4}\r\n",@file,@section,@key,@value)
+      else
+        return _INTL("File {1}, section {2}\r\n{3}\r\n",@file,@section,@value)
+      end
     else
       return _INTL("File {1}, line {2}\r\n{3}\r\n",@file,@lineno,@linedata)
     end
@@ -180,9 +184,11 @@ def pbEachFileSectionEx(f)
          lastsection={}
        else
         if sectionname==nil
+          FileLineData.setLine(line,lineno)
           raise _INTL("Expected a section at the beginning of the file. This error may also occur if the file was not saved in UTF-8.\r\n{1}",FileLineData.linereport)
         end
         if !line[/^\s*(\w+)\s*=\s*(.*)$/]
+          FileLineData.setSection(sectionname,nil,line)
           raise _INTL("Bad line syntax (expected syntax like XXX=YYY)\r\n{1}",FileLineData.linereport)
         end
         r1=$~[1]
@@ -2103,10 +2109,11 @@ def pbExtractTrainers
        rescue
          next
        end
-       f.write(sprintf("%d,%s,%s,%d,%s,%s,%s,%s\r\n",
+       f.write(sprintf("%d,%s,%s,%d,%s,%s,%s,%s,%d,%s\r\n",
           record[0],csvquote(cnst),csvquote(record[2]),
           record[3],csvquote(record[4]),csvquote(record[5]),csvquote(record[6]),
-          record[7] ? ["Male","Female","Mixed"][record[7]] : "Mixed"
+          record[7] ? ["Male","Female","Mixed"][record[7]] : "Mixed",
+          record[8],record[9]
        ))
      end
   }
@@ -2119,7 +2126,7 @@ def pbCompileTrainers
   count=0
   maxValue=0
   pbCompilerEachPreppedLine("PBS/trainertypes.txt"){|line,lineno|
-     record=pbGetCsvRecord(line,lineno,[0,"unsUSSSeUs", # ID can be 0
+     record=pbGetCsvRecord(line,lineno,[0,"unsUSSSeUS", # ID can be 0
         nil,nil,nil,nil,nil,nil,nil,{
         ""=>2,"Male"=>0,"M"=>0,"0"=>0,"Female"=>1,"F"=>1,"1"=>1,"Mixed"=>2,"X"=>2,"2"=>2
         },nil,nil]
@@ -2132,12 +2139,11 @@ def pbCompileTrainers
        raise _INTL("Bad skill value (must be from 0 through 255)\r\n{1}",FileLineData.linereport)
      end
      record[8]=record[3] if !record[8]
-     record[9]="" if !record[9]
-     trainernames[record[0]]=record[2]
      if records[record[0]]
        raise _INTL("Two trainer types ({1} and {2}) have the same ID ({3}), which is not allowed.\r\n{4}",
           records[record[0]][1],record[1],record[0],FileLineData.linereport)
      end
+     trainernames[record[0]]=record[2]
      records[record[0]]=record
      maxValue=[maxValue,record[0]].max
   }
@@ -2148,9 +2154,9 @@ def pbCompileTrainers
     next if !rec
     code+="#{rec[1]}=#{rec[0]}\r\n"
   end
-  code+="\r\ndef PBTrainers.getName(id)\r\nreturn pbGetMessage(MessageTypes::TrainerTypes,id)\r\nend"
-  code+="\r\ndef PBTrainers.getCount\r\nreturn #{count}\r\nend"
-  code+="\r\ndef PBTrainers.maxValue\r\nreturn #{maxValue}\r\nend\r\nend"
+  code+="\r\ndef self.getName(id)\r\nreturn pbGetMessage(MessageTypes::TrainerTypes,id)\r\nend"
+  code+="\r\ndef self.getCount\r\nreturn #{count}\r\nend"
+  code+="\r\ndef self.maxValue\r\nreturn #{maxValue}\r\nend\r\nend"
   eval(code)
   pbAddScript(code,"PBTrainers")
   File.open("Data/trainertypes.dat","wb"){|f|
@@ -2468,6 +2474,7 @@ def pbCompileTrainerLists
   MessageTypes.setMessagesAsHash(MessageTypes::EndSpeechWin,[])
   MessageTypes.setMessagesAsHash(MessageTypes::EndSpeechLose,[])
   File.open("PBS/trainerlists.txt","rb"){|f|
+     FileLineData.file="PBS/trainerlists.txt"
      pbEachFileSectionEx(f){|section,name|
         next if name!="DefaultTrainerList" && name!="TrainerList"
         rsection=[]

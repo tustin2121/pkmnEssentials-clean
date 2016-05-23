@@ -36,6 +36,7 @@ class Sprite_Character < RPG::Sprite
     super(viewport)
     @character = character
     @oldbushdepth=0
+    @bobframetime=1.0/15
     update
   end
 
@@ -84,6 +85,7 @@ class Sprite_Character < RPG::Sprite
       @tile_id = @character.tile_id
       @character_name = @character.character_name
       @character_hue = @character.character_hue
+      @oldbushdepth = @character.bush_depth
       if @tile_id >= 384
         @charbitmap.dispose if @charbitmap
         @charbitmap = pbGetTileBitmap(@character.map.tileset_name,
@@ -98,20 +100,15 @@ class Sprite_Character < RPG::Sprite
         self.oy = Game_Map::TILEHEIGHT
       else
         @charbitmap.dispose if @charbitmap
-        @charbitmap = AnimatedBitmap.new(
-           "Graphics/Characters/"+@character.character_name,
-           @character.character_hue)
+        @charbitmap = AnimatedBitmap.new("Graphics/Characters/"+@character.character_name,
+                                         @character.character_hue)
         @charbitmapAnimated=true
         @bushbitmap.dispose if @bushbitmap
         @bushbitmap=nil
         @cw = @charbitmap.width / 4
         @ch = @charbitmap.height / 4
         self.ox = @cw / 2
-        if @character_name[/offset/]
-          self.oy = @ch - 16
-        else
-          self.oy = @ch
-        end
+        self.oy = (@character_name[/offset/]) ? @ch - 16 : @ch
       end
     end
     @charbitmap.update if @charbitmapAnimated
@@ -125,23 +122,18 @@ class Sprite_Character < RPG::Sprite
       self.bitmap=@bushbitmap.bitmap
     end
     self.visible = (not @character.transparent)
-    if @character==$game_player && @tile_id == 0
-      if $PokemonGlobal.surfing || $PokemonGlobal.diving
-        bob=((Graphics.frame_count%60)/15).floor
-        self.oy=(bob>=2) ? @ch-16-2 : @ch-16
-      end
-    end
     if @tile_id == 0
-      if @character==$game_player && !$PokemonGlobal.fishing &&
+      sx=@character.pattern * @cw
+      if @character==$game_player &&
          ($PokemonGlobal.surfing || $PokemonGlobal.diving)
-        sx = bob * @cw
-        sy = (@character.direction - 2) / 2 * @ch
-        self.src_rect.set(sx, sy, @cw, @ch)
-      else
-        sx = @character.pattern * @cw
-        sy = (@character.direction - 2) / 2 * @ch
-        self.src_rect.set(sx, sy, @cw, @ch)
+        bob=((Graphics.frame_count%60)*@bobframetime).floor
+        self.oy=(bob>=2) ? @ch-16-2 : @ch-16
+        if !$PokemonGlobal.fishing
+          sx=bob * @cw
+        end
       end
+      sy = (@character.direction - 2) / 2 * @ch
+      self.src_rect.set(sx, sy, @cw, @ch)
     end
     if self.visible
       if $PokemonSystem.tilemap==0 ||

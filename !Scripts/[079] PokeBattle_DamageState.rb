@@ -27,3 +27,45 @@ class PokeBattle_DamageState
     reset
   end
 end
+
+
+
+################################################################################
+# Success state (used for Battle Arena)
+################################################################################
+class PokeBattle_SuccessState
+  attr_accessor :typemod
+  attr_accessor :useState    # 0 - not used, 1 - failed, 2 - succeeded
+  attr_accessor :protected
+  attr_accessor :skill
+
+  def initialize
+    clear
+  end
+
+  def clear
+    @typemod   = 4
+    @useState  = 0
+    @protected = false
+    @skill     = 0
+  end
+
+  def updateSkill
+    if @useState==1 && !@protected
+      @skill-=2
+    elsif @useState==2
+      if @typemod>4
+        @skill+=2 # "Super effective"
+      elsif @typemod>=1 && @typemod<4
+        @skill-=1 # "Not very effective"
+      elsif @typemod==0
+        @skill-=2 # Ineffective
+      else
+        @skill+=1
+      end
+    end
+    @typemod=4
+    @useState=0
+    @protected=false
+  end
+end

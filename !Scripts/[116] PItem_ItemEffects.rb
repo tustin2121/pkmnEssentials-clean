@@ -293,8 +293,10 @@ ItemHandlers::UseOnPokemon.add(:FIRESTONE,proc{|item,pokemon,scene|
         evo.pbStartScreen(pokemon,newspecies)
         evo.pbEvolution(false)
         evo.pbEndScreen
-        scene.pbRefreshAnnotations(proc{|p| pbCheckEvolution(p,item)>0 })
-        scene.pbRefresh
+        if scene.is_a?(PokemonBag_Scene)
+          scene.pbRefreshAnnotations(proc{|p| pbCheckEvolution(p,item)>0 })
+          scene.pbRefresh
+        end
      }
      next true
    end

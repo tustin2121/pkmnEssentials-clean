@@ -3057,7 +3057,7 @@ class SpriteWindow_Selectable < SpriteWindow_Base
     self.top_row = [self.top_row, self.row_max - self.page_row_max].min
     cursor_width = (self.width-self.borderX) / @column_max
     x = self.index % @column_max * (cursor_width + @column_spacing)
-    y = self.index/ @column_max * @row_height - @virtualOy
+    y = self.index / @column_max * @row_height - @virtualOy
     self.cursor_rect.set(x, y, cursor_width, @row_height)
     self.refresh if dorefresh || force
   end

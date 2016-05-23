@@ -88,7 +88,7 @@ class Game_Event < Game_Character
   end
 
   def setTempSwitchOn(c)
-    @tempSwitches[c]=true    
+    @tempSwitches[c]=true
     refresh
   end
 

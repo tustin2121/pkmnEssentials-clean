@@ -72,12 +72,10 @@ class PokemonDuel
     @oldeventspeed=event.move_speed
     pbMoveRoute($game_player,[
        PBMoveRoute::ChangeSpeed,2,
-       PBMoveRoute::DirectionFixOn
-    ])
+       PBMoveRoute::DirectionFixOn])
     pbMoveRoute(event,[
        PBMoveRoute::ChangeSpeed,2,
-       PBMoveRoute::DirectionFixOn
-    ])
+       PBMoveRoute::DirectionFixOn])
     pbWait(30)
   end
 
@@ -124,12 +122,10 @@ class PokemonDuel
     pbWait(30)
     pbMoveRoute($game_player,[
        PBMoveRoute::DirectionFixOff, 
-       PBMoveRoute::ChangeSpeed,@oldmovespeed
-    ])
+       PBMoveRoute::ChangeSpeed,@oldmovespeed])
     pbMoveRoute(@event,[
        PBMoveRoute::DirectionFixOff, 
-       PBMoveRoute::ChangeSpeed,@oldeventspeed
-    ])
+       PBMoveRoute::ChangeSpeed,@oldeventspeed])
     16.times do
       @sprites["player"].opacity-=16
       @sprites["opponent"].opacity-=16
@@ -200,28 +196,24 @@ class PokemonDuel
            PBMoveRoute::ScriptAsync,"moveRight90",
            PBMoveRoute::ScriptAsync,"moveLeft90",
            PBMoveRoute::ScriptAsync,"moveLeft90",
-           PBMoveRoute::ScriptAsync,"moveRight90"
-        ])
+           PBMoveRoute::ScriptAsync,"moveRight90"])
         pbMoveRoute(event,[
            PBMoveRoute::ScriptAsync,"moveLeft90",
            PBMoveRoute::ScriptAsync,"moveRight90",
            PBMoveRoute::ScriptAsync,"moveRight90",
-           PBMoveRoute::ScriptAsync,"moveLeft90"
-        ])
+           PBMoveRoute::ScriptAsync,"moveLeft90"])
         pbWait(10*2)
         Kernel.pbMessage(_INTL("You study each other's movements..."))
       elsif action==0 && command==1
         pbMoveRoute($game_player,[
            PBMoveRoute::ChangeSpeed,4, 
-           PBMoveRoute::Forward
-        ])
+           PBMoveRoute::Forward])
         pbWait(8*2)
         pbShake(9,9,8)
         pbFlashScreens(false,true)
         pbMoveRoute($game_player,[
            PBMoveRoute::ChangeSpeed,2, 
-           PBMoveRoute::Backward
-        ])
+           PBMoveRoute::Backward])
         @hp[1]-=1
         Kernel.pbMessage(_INTL("Your attack was not blocked!"))
       elsif action==0 && command==2
@@ -241,8 +233,8 @@ class PokemonDuel
         Kernel.pbMessage(_INTL("Your attack was evaded!"))
       elsif (action==0 || action==1 || action==2) && command==3
         pbMoveRoute($game_player,[
-        PBMoveRoute::ChangeSpeed,4, 
-        PBMoveRoute::ScriptAsync,"jumpForward"])
+           PBMoveRoute::ChangeSpeed,4, 
+           PBMoveRoute::ScriptAsync,"jumpForward"])
         pbWait(8*2)
         pbMoveRoute(event,[
            PBMoveRoute::ChangeSpeed,5,
@@ -262,15 +254,13 @@ class PokemonDuel
       elsif action==1 && command==0
         pbMoveRoute(event,[
            PBMoveRoute::ChangeSpeed,4, 
-           PBMoveRoute::Forward
-        ])
+           PBMoveRoute::Forward])
         pbWait(8*2)
         pbShake(9,9,8)
         pbFlashScreens(true,false)
         pbMoveRoute(event,[
            PBMoveRoute::ChangeSpeed,2, 
-           PBMoveRoute::Backward
-        ])
+           PBMoveRoute::Backward])
         @hp[0]-=1
         Kernel.pbMessage(_INTL("You fail to block the opponent's attack!"))
       elsif action==1 && command==1
@@ -357,24 +347,20 @@ class PokemonDuel
         pbMoveRoute($game_player,[PBMoveRoute::Backward])
         pbMoveRoute($game_player,[
            PBMoveRoute::ChangeSpeed,4,
-           PBMoveRoute::ScriptAsync,"jumpForward"
-        ])
+           PBMoveRoute::ScriptAsync,"jumpForward"])
         pbMoveRoute(event,[
            PBMoveRoute::Wait,15,
            PBMoveRoute::ChangeSpeed,4,
-           PBMoveRoute::ScriptAsync,"jumpForward"
-        ])
+           PBMoveRoute::ScriptAsync,"jumpForward"])
         pbWait(20*2)
         pbMoveRoute(event,[
            PBMoveRoute::ChangeSpeed,5,
            PBMoveRoute::Backward,
-           PBMoveRoute::ChangeSpeed,2
-        ])
+           PBMoveRoute::ChangeSpeed,2])
         pbMoveRoute($game_player,[
            PBMoveRoute::ChangeSpeed,5,
            PBMoveRoute::Backward,
-           PBMoveRoute::ChangeSpeed,2
-        ])
+           PBMoveRoute::ChangeSpeed,2])
         pbShake(9,9,8)
         pbFlash(Color.new(255,255,255,255),20)
         pbFlashScreens(true,true)

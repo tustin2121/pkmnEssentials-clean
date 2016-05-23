@@ -348,6 +348,7 @@ class FightMenuDisplay
       @info.text=_ISPRINTF("{1:s}PP: {2: 2d}/{3: 2d}<br>TYPE/{4:s}",
          @ctag,selmove.pp,selmove.totalpp,movetype)
     end
+    @buttons.refresh(self.index,@battler ? @battler.moves : nil,@megaButton) if @buttons
   end
 
   def update
@@ -2508,12 +2509,17 @@ class PokeBattle_Scene
     end
   end
 
-  def pbFirstTarget(index)
-    for i in 0...4
-      if i!=index && !@battle.battlers[i].isFainted? && 
-         @battle.battlers[index].pbIsOpposing?(i)
-        return i
-      end  
+  def pbFirstTarget(index,targettype)
+    case targettype
+    when PBTargets::SingleNonUser
+      for i in 0...4
+        if i!=index && !@battle.battlers[i].isFainted? && 
+           @battle.battlers[index].pbIsOpposing?(i)
+          return i
+        end  
+      end
+    when PBTargets::UserOrPartner
+      return index
     end
     return -1
   end
@@ -2535,9 +2541,19 @@ class PokeBattle_Scene
 
 # Use this method to make the player choose a target 
 # for certain moves in double battles.
-  def pbChooseTarget(index)
+  def pbChooseTarget(index,targettype)
     pbShowWindow(FIGHTBOX)
-    curwindow=pbFirstTarget(index)
+    cw = @sprites["fightwindow"]
+    battler=@battle.battlers[index]
+    cw.battler=battler
+    lastIndex=@lastmove[index]
+    if battler.moves[lastIndex].id!=0
+      cw.setIndex(lastIndex)
+    else
+      cw.setIndex(0)
+    end
+    
+    curwindow=pbFirstTarget(index,targettype)
     if curwindow==-1
       raise RuntimeError.new(_INTL("No targets somehow..."))
     end
@@ -2557,22 +2573,36 @@ class PokeBattle_Scene
       if curwindow>=0
         if Input.trigger?(Input::RIGHT) || Input.trigger?(Input::DOWN)
           loop do
-            newcurwindow=3 if curwindow==0
-            newcurwindow=1 if curwindow==3
-            newcurwindow=2 if curwindow==1
-            newcurwindow=0 if curwindow==2
+            case targettype
+            when PBTargets::SingleNonUser
+              case curwindow
+              when 0; newcurwindow=2
+              when 1; newcurwindow=0
+              when 2; newcurwindow=3
+              when 3; newcurwindow=1
+              end
+            when PBTargets::UserOrPartner
+              newcurwindow=(curwindow+2)%4
+            end
             curwindow=newcurwindow
-            next if curwindow==index
+            next if targettype==PBTargets::SingleNonUser && curwindow==index
             break if !@battle.battlers[curwindow].isFainted?
           end
         elsif Input.trigger?(Input::LEFT) || Input.trigger?(Input::UP)
           loop do 
-            newcurwindow=2 if curwindow==0
-            newcurwindow=1 if curwindow==2
-            newcurwindow=3 if curwindow==1
-            newcurwindow=0 if curwindow==3
+            case targettype
+            when PBTargets::SingleNonUser
+              case curwindow
+              when 0; newcurwindow=1
+              when 1; newcurwindow=3
+              when 2; newcurwindow=0
+              when 3; newcurwindow=2
+              end
+            when PBTargets::UserOrPartner
+              newcurwindow=(curwindow+2)%4
+            end
             curwindow=newcurwindow
-            next if curwindow==index
+            next if targettype==PBTargets::SingleNonUser && curwindow==index
             break if !@battle.battlers[curwindow].isFainted?
           end
         end

@@ -1,0 +1,604 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+			[
+				"rep",
+				"repeat"
+			],
+			[
+				"dr",
+				"drawVisual"
+			],
+			[
+				"draw",
+				"drawBackground"
+			],
+			[
+				"slice",
+				"sliceWidth"
+			],
+			[
+				"sl",
+				"sliceWidth"
+			],
+			[
+				"canv",
+				"canvasCtx"
+			],
+			[
+				"back",
+				"background-color"
+			],
+			[
+				"show",
+				"showCurtain"
+			],
+			[
+				"fa",
+				"fallbackValue"
+			],
+			[
+				"lan",
+				"langCode"
+			],
+			[
+				"co",
+				"config"
+			],
+			[
+				"bo",
+				"bottom"
+			],
+			[
+				"f",
+				"font-family"
+			],
+			[
+				"border-le",
+				"border-left-color"
+			],
+			[
+				"border-l",
+				"border-left"
+			],
+			[
+				"login",
+				"loginUser"
+			],
+			[
+				"err",
+				"error"
+			],
+			[
+				"copy",
+				"copyFile"
+			],
+			[
+				"e",
+				"establishConnection"
+			],
+			[
+				"rend",
+				"renderPasses"
+			],
+			[
+				"Ren",
+				"RenderPass"
+			],
+			[
+				"log",
+				"logicFns"
+			],
+			[
+				"tic",
+				"ticksPerSecond"
+			],
+			[
+				"pro",
+				"processLogicTick"
+			],
+			[
+				"ren",
+				"renderPasses"
+			],
+			[
+				"cle",
+				"clearColor"
+			],
+			[
+				"vi",
+				"viewport_h"
+			],
+			[
+				"re",
+				"renderHeight"
+			],
+			[
+				"min",
+				"min-width"
+			],
+			[
+				"op",
+				"optionJson"
+			],
+			[
+				"cm",
+				"cmdlineArgs"
+			],
+			[
+				"lo",
+				"logger"
+			],
+			[
+				"get",
+				"getLogger"
+			],
+			[
+				"fun",
+				"function"
+			],
+			[
+				"req",
+				"require"
+			],
+			[
+				"fav",
+				"faviconFile"
+			],
+			[
+				"se",
+				"setupExpressRoutes"
+			],
+			[
+				"copyFile",
+				"copyFileApplyingTemplate"
+			],
+			[
+				"to",
+				"tokens"
+			],
+			[
+				"TR",
+				"TRANSFORM_PROPS"
+			],
+			[
+				"sta",
+				"statSync"
+			],
+			[
+				"cli",
+				"clientType"
+			],
+			[
+				"con",
+				"console"
+			],
+			[
+				"r",
+				"require"
+			],
+			[
+				"so",
+				"socketio"
+			],
+			[
+				"inp",
+				"inputContext"
+			],
+			[
+				"Objec",
+				"Object3D"
+			],
+			[
+				"index",
+				"indexOf"
+			]
+		]
+	},
+	"buffers":
+	[
+	],
+	"build_system": "Run in GM Tool",
+	"command_palette":
+	{
+		"height": 0.0,
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"console":
+	{
+		"height": 0.0
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"file_history":
+	[
+		"/C/Users/tpittman/Dropbox/Current Projects/RPGMakerXP/!downloads/Scripts/[109] PField_DependentEvents.rb",
+		"/C/Users/tpittman/Dropbox/Current Projects/RPGMakerXP/!downloads/Scripts/!!Wiki_Script_Sections",
+		"/C/Users/tpittman/Dropbox/Current Projects/RPGMakerXP/!downloads/Scripts/[063] MiscData.rb",
+		"/C/Users/tpittman/Dropbox/Current Projects/RPGMakerXP/!downloads/Scripts/[102] PField_HiddenMoves.rb",
+		"/C/Users/tpittman/Dropbox/Current Projects/RPGMakerXP/!downloads/Scripts/[022] Walk_Run.rb",
+		"/C/Users/tpittman/Dropbox/Current Projects/RPGMakerXP/!downloads/Scripts/[021] Game_Player.rb",
+		"/C/Users/tpittman/Dropbox/Current Projects/RPGMakerXP/!downloads/Scripts/[170] PSystem_Utilities.rb",
+		"/C/Users/tpittman/Dropbox/Current Projects/RPGMakerXP/!downloads/Scripts/[052] Messages.rb",
+		"/C/Users/tpittman/Dropbox/Current Projects/RPGMakerXP/!downloads/Scripts/[020] Game_Event.rb",
+		"/C/Users/tpittman/Dropbox/Current Projects/RPGMakerXP/!downloads/Scripts/[080] PokeBattle_Battler.rb",
+		"/C/Users/tpittman/Dropbox/Current Projects/RPGMakerXP/!downloads/Scripts/[084] PokeBattle_Battle.rb",
+		"/C/Users/tpittman/Dropbox/Current Projects/RPGMakerXP/!downloads/Scripts/[081] PokeBattle_BattlerEffects.rb",
+		"/C/Users/tpittman/Dropbox/Current Projects/RPGMakerXP/!downloads/Scripts/[016] Game_Map_Resolution.rb",
+		"/C/Users/tpittman/Dropbox/Current Projects/RPGMakerXP/!downloads/Scripts/[017] Game_Map_Autoscroll.rb",
+		"/C/Users/tpittman/Dropbox/Current Projects/RPGMakerXP/!downloads/Scripts/[056] Scene_Map.rb",
+		"/C/Users/tpittman/Dropbox/Current Projects/RPGMakerXP/!downloads/Scripts/[015] Game_Map.rb",
+		"/C/Users/tpittman/Dropbox/Current Projects/RPGMakerXP/!downloads/Scripts/[029] Spriteset_Map.rb",
+		"/C/Users/tpittman/Dropbox/Current Projects/RPGMakerXP/!downloads/Scripts/[034] AnimationSprite.rb",
+		"/C/Users/tpittman/Dropbox/Current Projects/RPGMakerXP/!downloads/Scripts/SecretBase_edited.rb",
+		"/C/Users/tpittman/Dropbox/Current Projects/RPGMakerXP/!downloads/Scripts/[050] SpriteWindow.rb",
+		"/C/Users/tpittman/Dropbox/Current Projects/RPGMakerXP/!downloads/Scripts/[097] PBTerrain.rb",
+		"/C/Users/tpittman/Dropbox/Current Projects/RPGMakerXP/!downloads/Scripts/[116] PItem_ItemEffects.rb",
+		"/C/Users/tpittman/Dropbox/Current Projects/RPGMakerXP/!downloads/Scripts/[113] PTrainer_NPCTrainers.rb",
+		"/C/Users/tpittman/Dropbox/Current Projects/RPGMakerXP/!downloads/Scripts/[075] PBEffects.rb",
+		"/C/Users/tpittman/Dropbox/Current Projects/RPGMakerXP/!downloads/Scripts/[038] Interpreter.rb",
+		"/C/Users/tpittman/Dropbox/Current Projects/RPGMakerXP/!downloads/Scripts/[087] PokeBattle_Scene.rb",
+		"/C/Users/tpittman/Dropbox/Current Projects/RPGMakerXP/!downloads/Scripts/[094] PokeBattle_BattlePeer.rb",
+		"/C/Users/tpittman/Dropbox/Current Projects/RPGMakerXP/!downloads/Scripts/[051] DrawText.rb",
+		"/C/Users/tpittman/Dropbox/Current Projects/RPGMakerXP/!downloads/Scripts/[098] PField_Field.rb",
+		"/C/Users/tpittman/Dropbox/Current Projects/RPGMakerXP/!downloads/Scripts/[115] PItem_Items.rb",
+		"/C/Users/tpittman/Dropbox/Current Projects/RPGMakerXP/!downloads/Scripts/[107] PField_BerryPlants.rb",
+		"/C/Users/tpittman/Dropbox/Current Projects/RPGMakerXP/!downloads/Scripts/[039] Event.rb",
+		"/C/Users/tpittman/Dropbox/Current Projects/RPGMakerXP/!downloads/Scripts/[108] PField_DayCare.rb",
+		"/C/Users/tpittman/Dropbox/Current Projects/RPGMakerXP/!downloads/Scripts/[005] Sockets.rb",
+		"/C/Users/tpittman/Dropbox/Current Projects/RPGMakerXP/!downloads/Scripts/[003] RPG__Sprite.rb",
+		"/C/Users/tpittman/Dropbox/Current Projects/RPGMakerXP/!downloads/Scripts/[169] PSystem_System.rb",
+		"/C/Users/tpittman/Dropbox/Current Projects/RPGMakerXP/!downloads/Scripts/[176] Compiler.rb",
+		"/C/Users/tpittman/Dropbox/Current Projects/RPGMakerXP/!downloads/Scripts/[040] File_Mixins.rb",
+		"/C/Users/tpittman/Dropbox/Current Projects/RPGMakerXP/!downloads/Scripts/[006] DebugConsole.rb",
+		"/C/Users/tpittman/Dropbox/Current Projects/RPGMakerXP/!downloads/Scripts/[046] AudioUtilities.rb",
+		"/C/Users/tpittman/Dropbox/Current Projects/RPGMakerXP/!downloads/Scripts/[168] PSystem_Controls.rb",
+		"/C/Users/tpittman/Dropbox/Current Projects/RPGMakerXP/!downloads/Scripts/[044] Audio.rb",
+		"/C/Users/tpittman/Dropbox/Current Projects/RPGMakerXP/!downloads/Scripts/[143] PScreen_Options.rb",
+		"/C/Users/tpittman/Dropbox/Current Projects/RPGMakerXP/!downloads/Scripts/[032] TilemapLoader.rb",
+		"/C/Users/tpittman/Dropbox/Current Projects/RPGMakerXP/!downloads/Scripts/[024] Sprite_Character.rb",
+		"/C/Users/tpittman/Dropbox/Current Projects/RPGMakerXP/PkmnRMXPGame/Data/dexdata.dat",
+		"/C/Users/tpittman/Dropbox/Current Projects/RPGMakerXP/!downloads/Scripts/RMXP_PkmnEssentials_scripts.sublime-project",
+		"/C/Users/Tim/Dropbox/Current Projects/RPGMakerXP/!downloads/Scripts/[999] Main.rb",
+		"/C/Users/Tim/Dropbox/Current Projects/RPGMakerXP/!downloads/Scripts/[177] ================",
+		"/C/Users/Tim/Dropbox/Current Projects/RPGMakerXP/!downloads/Scripts/[176] Compiler.rb",
+		"/C/Users/Tim/Dropbox/Current Projects/RPGMakerXP/!downloads/Scripts/[175] Editor.rb",
+		"/C/Users/Tim/Dropbox/Current Projects/RPGMakerXP/!downloads/Scripts/[174] BattleAnimationEditor.rb",
+		"/C/Users/Tim/Dropbox/Current Projects/RPGMakerXP/!downloads/Scripts/[173] TilesetEditor.rb",
+		"/C/Users/Tim/Dropbox/Current Projects/RPGMakerXP/!downloads/Scripts/[172] Debug.rb",
+		"/C/Users/Tim/Dropbox/Current Projects/RPGMakerXP/!downloads/Scripts/[171] ================",
+		"/C/Users/Tim/Dropbox/Current Projects/RPGMakerXP/!downloads/Scripts/[170] PSystem_Utilities.rb",
+		"/C/Users/Tim/Dropbox/Current Projects/RPGMakerXP/!downloads/Scripts/[169] PSystem_System.rb",
+		"/C/Users/Tim/Dropbox/Current Projects/RPGMakerXP/!downloads/Scripts/[168] PSystem_Controls.rb",
+		"/C/Users/Tim/Dropbox/Current Projects/RPGMakerXP/!downloads/Scripts/[167] ================",
+		"/C/Users/Tim/Dropbox/Current Projects/RPGMakerXP/!downloads/Scripts/[166] PMinigame_TilePuzzles.rb",
+		"/C/Users/Tim/Dropbox/Current Projects/RPGMakerXP/!downloads/Scripts/[165] PMinigame_Mining.rb",
+		"/C/Users/Tim/Dropbox/Current Projects/RPGMakerXP/!downloads/Scripts/[164] PMinigame_Lottery.rb",
+		"/C/Users/Tim/Dropbox/Current Projects/RPGMakerXP/!downloads/Scripts/[163] PMinigame_VoltorbFlip.rb",
+		"/C/Users/Tim/Dropbox/Current Projects/RPGMakerXP/!downloads/Scripts/[162] PMinigame_SlotMachine.rb",
+		"/C/Users/Tim/Dropbox/Current Projects/RPGMakerXP/!downloads/Scripts/[161] PMinigame_TripleTriad.rb",
+		"/C/Users/Tim/Dropbox/Current Projects/RPGMakerXP/!downloads/Scripts/[160] PMinigame_Duel.rb",
+		"/C/Users/Tim/Dropbox/Current Projects/RPGMakerXP/!downloads/Scripts/[159] ================",
+		"/C/Users/Tim/Dropbox/Current Projects/RPGMakerXP/!downloads/Scripts/[158] PBattle_BattleSwap.rb",
+		"/C/Users/Tim/Dropbox/Current Projects/RPGMakerXP/!downloads/Scripts/[157] PBattle_OrgBattleGenerator.rb",
+		"/C/Users/Tim/Dropbox/Current Projects/RPGMakerXP/!downloads/Scripts/[156] PBattle_OrgBattleRules.rb",
+		"/C/Users/Tim/Dropbox/Current Projects/RPGMakerXP/!downloads/Scripts/[155] PBattle_OrgBattle.rb",
+		"/C/Users/Tim/Dropbox/Current Projects/RPGMakerXP/!downloads/Scripts/[154] PBattle_BugContest.rb",
+		"/C/Users/Tim/Dropbox/Current Projects/RPGMakerXP/!downloads/Scripts/[153] PBattle_Safari.rb",
+		"/C/Users/Tim/Dropbox/Current Projects/RPGMakerXP/!downloads/Scripts/[152] ================",
+		"/C/Users/Tim/Dropbox/Current Projects/RPGMakerXP/!downloads/Scripts/[151] PScreen_HallOfFame.rb",
+		"/C/Users/Tim/Dropbox/Current Projects/RPGMakerXP/!downloads/Scripts/[150] PScreen_MysteryGift.rb",
+		"/C/Users/Tim/Dropbox/Current Projects/RPGMakerXP/!downloads/Scripts/[149] PScreen_Mart.rb",
+		"/C/Users/Tim/Dropbox/Current Projects/RPGMakerXP/!downloads/Scripts/[148] PScreen_PurifyChamber.rb",
+		"/C/Users/Tim/Dropbox/Current Projects/RPGMakerXP/!downloads/Scripts/[147] PScreen_MoveRelearner.rb",
+		"/C/Users/Tim/Dropbox/Current Projects/RPGMakerXP/!downloads/Scripts/[146] PScreen_Trading.rb",
+		"/C/Users/Tim/Dropbox/Current Projects/RPGMakerXP/!downloads/Scripts/[145] PScreen_EggHatching.rb",
+		"/C/Users/Tim/Dropbox/Current Projects/RPGMakerXP/!downloads/Scripts/[144] PScreen_Storage.rb",
+		"/C/Users/Tim/Dropbox/Current Projects/RPGMakerXP/!downloads/Scripts/[143] PScreen_Options.rb",
+		"/C/Users/Tim/Dropbox/Current Projects/RPGMakerXP/!downloads/Scripts/[142] PScreen_Save.rb",
+		"/C/Users/Tim/Dropbox/Current Projects/RPGMakerXP/!downloads/Scripts/[141] PScreen_Load.rb",
+		"/C/Users/Tim/Dropbox/Current Projects/RPGMakerXP/!downloads/Scripts/[140] PScreen_TrainerCard.rb",
+		"/C/Users/Tim/Dropbox/Current Projects/RPGMakerXP/!downloads/Scripts/[139] PScreen_Jukebox.rb",
+		"/C/Users/Tim/Dropbox/Current Projects/RPGMakerXP/!downloads/Scripts/[138] PScreen_Phone.rb",
+		"/C/Users/Tim/Dropbox/Current Projects/RPGMakerXP/!downloads/Scripts/[137] PScreen_RegionMap.rb",
+		"/C/Users/Tim/Dropbox/Current Projects/RPGMakerXP/!downloads/Scripts/[136] PScreen_Pokegear.rb",
+		"/C/Users/Tim/Dropbox/Current Projects/RPGMakerXP/!downloads/Scripts/[135] PScreen_Bag.rb",
+		"/C/Users/Tim/Dropbox/Current Projects/RPGMakerXP/!downloads/Scripts/[134] PScreen_Summary.rb",
+		"/C/Users/Tim/Dropbox/Current Projects/RPGMakerXP/!downloads/Scripts/[133] PScreen_Party.rb",
+		"/C/Users/Tim/Dropbox/Current Projects/RPGMakerXP/!downloads/Scripts/[132] PScreen_PokedexNestForm.rb",
+		"/C/Users/Tim/Dropbox/Current Projects/RPGMakerXP/!downloads/Scripts/[131] PScreen_Pokedex.rb",
+		"/C/Users/Tim/Dropbox/Current Projects/RPGMakerXP/!downloads/Scripts/[130] PScreen_PauseMenu.rb",
+		"/C/Users/Tim/Dropbox/Current Projects/RPGMakerXP/!downloads/Scripts/[129] ================",
+		"/C/Users/Tim/Dropbox/Current Projects/RPGMakerXP/!downloads/Scripts/[128] Pokemon_Sprites.rb",
+		"/C/Users/Tim/Dropbox/Current Projects/RPGMakerXP/!downloads/Scripts/[127] Pokemon_Chatter.rb",
+		"/C/Users/Tim/Dropbox/Current Projects/RPGMakerXP/!downloads/Scripts/[126] Pokemon_Evolution.rb",
+		"/C/Users/Tim/Dropbox/Current Projects/RPGMakerXP/!downloads/Scripts/[125] Pokemon_ShadowPokemon.rb",
+		"/C/Users/Tim/Dropbox/Current Projects/RPGMakerXP/!downloads/Scripts/[124] Pokemon_MegaEvolution.rb",
+		"/C/Users/Tim/Dropbox/Current Projects/RPGMakerXP/!downloads/Scripts/[123] Pokemon_MultipleForms.rb",
+		"/C/Users/Tim/Dropbox/Current Projects/RPGMakerXP/!downloads/Scripts/[122] PokeBattle_Pokemon.rb",
+		"/C/Users/Tim/Dropbox/Current Projects/RPGMakerXP/!downloads/Scripts/[121] ================",
+		"/C/Users/Tim/Dropbox/Current Projects/RPGMakerXP/!downloads/Scripts/[120] PItem_Sprites.rb",
+		"/C/Users/Tim/Dropbox/Current Projects/RPGMakerXP/!downloads/Scripts/[119] PItem_Mail.rb",
+		"/C/Users/Tim/Dropbox/Current Projects/RPGMakerXP/!downloads/Scripts/[118] PItem_PokeRadar.rb",
+		"/C/Users/Tim/Dropbox/Current Projects/RPGMakerXP/!downloads/Scripts/[117] PItem_PokeBalls.rb",
+		"/C/Users/Tim/Dropbox/Current Projects/RPGMakerXP/!downloads/Scripts/[116] PItem_ItemEffects.rb",
+		"/C/Users/Tim/Dropbox/Current Projects/RPGMakerXP/!downloads/Scripts/[115] PItem_Items.rb",
+		"/C/Users/Tim/Dropbox/Current Projects/RPGMakerXP/!downloads/Scripts/[114] ================",
+		"/C/Users/Tim/Dropbox/Current Projects/RPGMakerXP/!downloads/Scripts/[113] PTrainer_NPCTrainers.rb",
+		"/C/Users/Tim/Dropbox/Current Projects/RPGMakerXP/!downloads/Scripts/[112] PokeBattle_Trainer.rb",
+		"/C/Users/Tim/Dropbox/Current Projects/RPGMakerXP/!downloads/Scripts/[111] ================",
+		"/C/Users/Tim/Dropbox/Current Projects/RPGMakerXP/!downloads/Scripts/[110] PField_Time.rb",
+		"/C/Users/Tim/Dropbox/Current Projects/RPGMakerXP/!downloads/Scripts/[109] PField_DependentEvents.rb",
+		"/C/Users/Tim/Dropbox/Current Projects/RPGMakerXP/!downloads/Scripts/[108] PField_DayCare.rb",
+		"/C/Users/Tim/Dropbox/Current Projects/RPGMakerXP/!downloads/Scripts/[107] PField_BerryPlants.rb",
+		"/C/Users/Tim/Dropbox/Current Projects/RPGMakerXP/!downloads/Scripts/[106] PField_RandomDungeons.rb",
+		"/C/Users/Tim/Dropbox/Current Projects/RPGMakerXP/!downloads/Scripts/[105] PField_RoamingPokemon.rb",
+		"/C/Users/Tim/Dropbox/Current Projects/RPGMakerXP/!downloads/Scripts/[104] PField_EncounterModifiers.rb",
+		"/C/Users/Tim/Dropbox/Current Projects/RPGMakerXP/!downloads/Scripts/[103] PField_Encounters.rb",
+		"/C/Users/Tim/Dropbox/Current Projects/RPGMakerXP/!downloads/Scripts/[102] PField_HiddenMoves.rb",
+		"/C/Users/Tim/Dropbox/Current Projects/RPGMakerXP/!downloads/Scripts/[101] PField_MapFactory.rb",
+		"/C/Users/Tim/Dropbox/Current Projects/RPGMakerXP/!downloads/Scripts/[100] PField_Metadata.rb",
+		"/C/Users/Tim/Dropbox/Current Projects/RPGMakerXP/!downloads/Scripts/[099] PField_FieldWeather.rb",
+		"/C/Users/Tim/Dropbox/Current Projects/RPGMakerXP/!downloads/Scripts/[098] PField_Field.rb"
+	],
+	"find":
+	{
+		"height": 34.0
+	},
+	"find_in_files":
+	{
+		"height": 0.0,
+		"where_history":
+		[
+			"<open folders>",
+			"C:\\Users\\Tim\\github-projects\\PTUPark\\server",
+			"<open folders>",
+			"C:\\Users\\Tim\\Dropbox\\Current Projects\\TPPCrystal\\!PeopleOfHoenn\\6-PreschoolerValerie",
+			"C:\\Users\\tpittman\\Desktop\\xml",
+			"C:\\Users\\tpittman\\github-projects\\TPPParkDev\\src",
+			""
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": false,
+		"find_history":
+		[
+			"pbMysteryGiftEncrypt",
+			"pbCreateMysteryGift",
+			"mysterygift",
+			"totalhp",
+			"class",
+			"decision",
+			"lastBattle",
+			"shiny",
+			"stop_count",
+			"update_stop",
+			"frequency",
+			"pbDexDataOffset",
+			"get_ch",
+			"$game_self_switches",
+			"command_123",
+			"$PokemonBag",
+			"$Bag",
+			"ba",
+			"$Bag",
+			"in_range?",
+			"over_trigger",
+			"in_range?",
+			"check_event_trigger_here",
+			"Kernel.pbOnStepTaken",
+			"Kernel.pbSlideOnIce",
+			"isIce?",
+			"darknessSprite",
+			"pbGetSpeechFrame",
+			"pbDefaultWindowskin",
+			"windowskin",
+			"SpriteWindow_Base",
+			"LocationWindow",
+			"sign",
+			".name",
+			"pbAddDepen",
+			"Kernel.pbAddDepen",
+			"pbTrainer",
+			"Shadow sneak",
+			"Shadow",
+			"Reset",
+			"Table",
+			"@passages",
+			"@priorities",
+			"@tileset",
+			"addTile",
+			"getRegularTile",
+			"addTile",
+			"priotilesfast",
+			"addTile",
+			"MessageTypes::MapNames",
+			"comm",
+			"command_355",
+			"script",
+			"class Game_Map",
+			"MetadataSnapEdges",
+			"display_x ?\\=",
+			".display_x",
+			"setup(",
+			"Events.onMapCreate",
+			"def pbCureStatus",
+			"pbCureStatus",
+			"pbFaint",
+			"@weatherduration",
+			"when PBWeather::",
+			"down",
+			"isIce?",
+			"::Ice",
+			"Ice",
+			"isIce?",
+			"AnimatedPlane",
+			"viewport1",
+			".viewport1",
+			"class Spriteset_Map",
+			"AnimationSprite",
+			"panorama",
+			"MapFactory",
+			"mapNam",
+			"PokemonGlobal",
+			"pokeballThrow",
+			"pbThrow",
+			"pbStorePokemon",
+			"$Trainer.money",
+			"command_125",
+			"Gold",
+			"setVariable",
+			"get_ch",
+			"pbExecuteScript",
+			"HandlerHash",
+			"ItemHandlers",
+			"UseFromBag",
+			"getLineBrokenChunks",
+			"draw_text",
+			".Pokegear",
+			"Font",
+			"def pbSet",
+			"pbSet",
+			"autoplay",
+			"pbUpdateVehicle",
+			"Kernel.pbTransferUnderwater",
+			"MetadataDiveMap",
+			"Bicycle",
+			"setTempSw",
+			"command_201",
+			"transfer_player",
+			"Kernel.pbCancelVehicles",
+			"$PokemonGlobal.diving",
+			"diving",
+			"divi",
+			"diving",
+			"pbUpdateSceneMap",
+			"DarknessSprite",
+			"Dark",
+			"$PokemonSystem.tilemap",
+			"tilemap",
+			"MAPVIEWMODE",
+			"Errno",
+			"SocketError",
+			"Thread",
+			"gethostbyname",
+			"socket",
+			"TCPSocket",
+			"AF_INET",
+			"Input.pressex",
+			"Input.repeatcount",
+			"Input.triggerex",
+			"Input.releaseex",
+			"Input.repeatex",
+			"Input.press?"
+		],
+		"highlight": true,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": false,
+		"replace_history":
+		[
+			"/* ------------------------------ */"
+		],
+		"reverse": false,
+		"show_context": true,
+		"use_buffer2": true,
+		"whole_word": false,
+		"wrap": true
+	},
+	"groups":
+	[
+		{
+			"sheets":
+			[
+			]
+		},
+		{
+			"sheets":
+			[
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 34.0
+	},
+	"input":
+	{
+		"height": 31.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			],
+			[
+				1,
+				0,
+				2,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			0.5,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"output.exec":
+	{
+		"height": 203.0
+	},
+	"replace":
+	{
+		"height": 62.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 0.0,
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"show_minimap": true,
+	"show_open_files": false,
+	"show_tabs": true,
+	"side_bar_visible": true,
+	"side_bar_width": 205.0,
+	"status_bar_visible": true
+}

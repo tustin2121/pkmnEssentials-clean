@@ -37,10 +37,11 @@ class TriadCard
   def bonus(opponent)
     atype=@type
     otype=opponent.type
-    mod=PBTypes.getEffectiveness(atype,otype)
-    return -2 if mod==0
-    return -1 if mod==1
-    return 1 if mod==4
+    case PBTypes.getEffectiveness(atype,otype)
+    when 0; return -2
+    when 1; return -1
+    when 4; return 1
+    end
     return 0
   end
 

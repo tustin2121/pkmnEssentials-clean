@@ -5,6 +5,7 @@ class PokeBattle_FakeBattler
     @owned=$Trainer.owned[pokemon.species]
   end
 
+  def index; return @index; end
   def pokemon; @pokemon; end
   def species; @pokemon.species; end
   def gender; @pokemon.gender; end
@@ -21,10 +22,9 @@ class PokeBattle_FakeBattler
   def isMega?; return false; end
   def hasPrimal?; return false; end
   def isPrimal?; return false; end
-
-  def index
-    return @index
-  end
+  def displayGender; return @pokemon.gender; end
+  def captured; return false; end
+  def captured=(value); end
 
   def pbThis(lowercase=false)
     return lowercase ? _INTL("the wild {1}",@pokemon.name) : _INTL("The wild {1}",@pokemon.name)
@@ -230,4 +230,6 @@ class PokeBattle_SafariZone
   def pbRandom(x)
     return rand(x)
   end
+
+  def pbGainEXP; end
 end

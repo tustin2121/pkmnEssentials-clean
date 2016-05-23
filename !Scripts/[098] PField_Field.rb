@@ -523,22 +523,114 @@ def pbBattleAnimation(bgm=nil,trainerid=-1,trainername="")
     $game_temp.background_bitmap.dispose
   end
   $game_temp.background_bitmap=Graphics.snap_to_bitmap
-# Animate the screen ($game_temp.background_bitmap contains
-# the current game screen).
-#
-# The following example runs a common event that does a custom animation if some
-# condition is true. The screen should fade to black when the common event is
-# finished:
-#
-# if $game_map && $game_map.map_id==20  # If on map 20
-#   pbCommonEvent(20)
-#   handled=true                        # Note that the battle animation is done
-# end
-#
-################################################################################
-# VS. animation, by Luka S.J.
-# Tweaked by Maruno.
-################################################################################
+  # Check for custom battle intro animations
+  handled=pbBattleAnimationOverride(viewport,trainerid,trainername)
+  # Default battle intro animation
+  if !handled
+    if Sprite.method_defined?(:wave_amp) && rand(15)==0
+      viewport.color=Color.new(0,0,0,255)
+      sprite = Sprite.new
+      bitmap=Graphics.snap_to_bitmap
+      bm=bitmap.clone
+      sprite.z=99999
+      sprite.bitmap = bm
+      sprite.wave_speed=500
+      for i in 0..25
+        sprite.opacity-=10
+        sprite.wave_amp+=60
+        sprite.update
+        sprite.wave_speed+=30
+        2.times do
+          Graphics.update
+        end
+      end
+      bitmap.dispose
+      bm.dispose
+      sprite.dispose
+    elsif Bitmap.method_defined?(:radial_blur) && rand(15)==0
+      viewport.color=Color.new(0,0,0,255)
+      sprite = Sprite.new
+      bitmap=Graphics.snap_to_bitmap
+      bm=bitmap.clone
+      sprite.z=99999
+      sprite.bitmap = bm
+      for i in 0..15
+        bm.radial_blur(i,2)
+        sprite.opacity-=15
+        2.times do
+          Graphics.update
+        end
+      end
+      bitmap.dispose
+      bm.dispose
+      sprite.dispose
+    elsif rand(10)==0 # Custom transition method
+      scroll=["ScrollDown","ScrollLeft","ScrollRight","ScrollUp",
+              "ScrollDownRight","ScrollDownLeft","ScrollUpRight","ScrollUpLeft"]
+      Graphics.freeze
+      viewport.color=Color.new(0,0,0,255)
+      Graphics.transition(50,sprintf("Graphics/Transitions/%s",scroll[rand(scroll.length)]))
+    else
+      transitions=[
+         # Transitions with graphic files
+         "021-Normal01","022-Normal02",
+         "Battle","battle1","battle2","battle3","battle4",
+         "computertr","computertrclose",
+         "hexatr","hexatrc","hexatzr",
+         "Image1","Image2","Image3","Image4",
+         # Custom transition methods
+         "Splash","Random_stripe_v","Random_stripe_h",
+         "RotatingPieces","ShrinkingPieces",
+         "BreakingGlass","Mosaic","zoomin"
+      ]
+      rnd=rand(transitions.length)
+      Graphics.freeze
+      viewport.color=Color.new(0,0,0,255)
+      Graphics.transition(40,sprintf("Graphics/Transitions/%s",transitions[rnd]))
+    end
+    5.times do
+      Graphics.update
+      Input.update
+      pbUpdateSceneMap
+    end
+  end
+  pbPushFade
+  yield if block_given?
+  pbPopFade
+  if $game_system && $game_system.is_a?(Game_System)
+    $game_system.bgm_resume(playingBGM)
+    $game_system.bgs_resume(playingBGS)
+  end
+  $PokemonGlobal.nextBattleBGM=nil
+  $PokemonGlobal.nextBattleME=nil
+  $PokemonGlobal.nextBattleBack=nil
+  $PokemonEncounters.clearStepCount
+  for j in 0..17
+    viewport.color=Color.new(0,0,0,(17-j)*15)
+    Graphics.update
+    Input.update
+    pbUpdateSceneMap
+  end
+  viewport.dispose
+end
+
+# Alias and use this method if you want to add a custom battle intro animation
+# e.g. variants of the Vs. animation.
+# Note that $game_temp.background_bitmap contains an image of the current game
+# screen.
+# When the custom animation has finished, the screen should have faded to black
+# somehow.
+def pbBattleAnimationOverride(viewport,trainerid=-1,trainername="")
+  # The following example runs a common event that ought to do a custom
+  # animation if some condition is true:
+  #
+  # if $game_map && $game_map.map_id==20   # If on map 20
+  #   pbCommonEvent(20)
+  #   return true                          # Note that the battle animation is done
+  # end
+  #
+  ##### VS. animation, by Luka S.J. #####
+  ##### Tweaked by Maruno           #####
   if trainerid>=0
     tbargraphic=sprintf("Graphics/Transitions/vsBar%s",getConstantName(PBTrainers,trainerid)) rescue nil
     tbargraphic=sprintf("Graphics/Transitions/vsBar%d",trainerid) if !pbResolveBitmap(tbargraphic)
@@ -687,96 +779,10 @@ def pbBattleAnimation(bgm=nil,trainerid=-1,trainername="")
       viewopp.dispose
       viewplayer.dispose
       viewport.color=Color.new(0,0,0,255)
-      handled=true
+      return true
     end
   end
-  # End of VS. sequence script
-  if !handled
-    if Sprite.method_defined?(:wave_amp) && rand(15)==0
-      viewport.color=Color.new(0,0,0,255)
-      sprite = Sprite.new
-      bitmap=Graphics.snap_to_bitmap
-      bm=bitmap.clone
-      sprite.z=99999
-      sprite.bitmap = bm
-      sprite.wave_speed=500
-      for i in 0..25
-        sprite.opacity-=10
-        sprite.wave_amp+=60
-        sprite.update
-        sprite.wave_speed+=30
-        2.times do
-          Graphics.update
-        end
-      end
-      bitmap.dispose
-      bm.dispose
-      sprite.dispose
-    elsif Bitmap.method_defined?(:radial_blur) && rand(15)==0
-      viewport.color=Color.new(0,0,0,255)
-      sprite = Sprite.new
-      bitmap=Graphics.snap_to_bitmap
-      bm=bitmap.clone
-      sprite.z=99999
-      sprite.bitmap = bm
-      for i in 0..15
-        bm.radial_blur(i,2)
-        sprite.opacity-=15
-        2.times do
-          Graphics.update
-        end
-      end
-      bitmap.dispose
-      bm.dispose
-      sprite.dispose
-    elsif rand(10)==0 # Custom transition method
-      scroll=["ScrollDown","ScrollLeft","ScrollRight","ScrollUp",
-              "ScrollDownRight","ScrollDownLeft","ScrollUpRight","ScrollUpLeft"]
-      Graphics.freeze
-      viewport.color=Color.new(0,0,0,255)
-      Graphics.transition(50,sprintf("Graphics/Transitions/%s",scroll[rand(scroll.length)]))
-    else
-      transitions=[
-         # Transitions with graphic files
-         "021-Normal01","022-Normal02",
-         "Battle","battle1","battle2","battle3","battle4",
-         "computertr","computertrclose",
-         "hexatr","hexatrc","hexatzr",
-         "Image1","Image2","Image3","Image4",
-         # Custom transition methods
-         "Splash","Random_stripe_v","Random_stripe_h",
-         "RotatingPieces","ShrinkingPieces",
-         "BreakingGlass","Mosaic","zoomin"
-      ]
-      rnd=rand(transitions.length)
-      Graphics.freeze
-      viewport.color=Color.new(0,0,0,255)
-      Graphics.transition(40,sprintf("Graphics/Transitions/%s",transitions[rnd]))
-    end
-    5.times do
-      Graphics.update
-      Input.update
-      pbUpdateSceneMap
-    end
-  end
-  pbPushFade
-  yield if block_given?
-  pbPopFade
-  if $game_system && $game_system.is_a?(Game_System)
-    $game_system.bgm_resume(playingBGM)
-    $game_system.bgs_resume(playingBGS)
-  end
-  $PokemonGlobal.nextBattleBGM=nil
-  $PokemonGlobal.nextBattleME=nil
-  $PokemonGlobal.nextBattleBack=nil
-  $PokemonEncounters.clearStepCount
-  for j in 0..17
-    viewport.color=Color.new(0,0,0,(17-j)*15)
-    Graphics.update
-    Input.update
-    pbUpdateSceneMap
-  end
-  viewport.dispose
+  return false
 end
 
 def pbPrepareBattle(battle)
@@ -808,22 +814,19 @@ def pbGetEnvironment
   elsif !pbGetMetadata($game_map.map_id,MetadataOutdoor)
     return PBEnvironment::None
   else
-    terrain=$game_player.terrain_tag
-    if terrain==PBTerrain::Grass # Normal grass
-      return PBEnvironment::Grass
-    elsif terrain==PBTerrain::TallGrass # Tall grass
-      return PBEnvironment::TallGrass
-    elsif terrain==PBTerrain::DeepWater || terrain==PBTerrain::Water
-      return PBEnvironment::MovingWater
-    elsif terrain==PBTerrain::StillWater
-      return PBEnvironment::StillWater
-    elsif terrain==PBTerrain::Rock
-      return PBEnvironment::Rock
-    elsif terrain==PBTerrain::Sand
-      return PBEnvironment::Sand
+    case $game_player.terrain_tag
+    when PBTerrain::Grass;      return PBEnvironment::Grass       # Normal grass
+    when PBTerrain::Sand;       return PBEnvironment::Sand
+    when PBTerrain::Rock;       return PBEnvironment::Rock
+    when PBTerrain::DeepWater;  return PBEnvironment::MovingWater
+    when PBTerrain::StillWater; return PBEnvironment::StillWater
+    when PBTerrain::Water;      return PBEnvironment::MovingWater
+    when PBTerrain::TallGrass;  return PBEnvironment::TallGrass   # Tall grass
+    when PBTerrain::SootGrass;  return PBEnvironment::Grass       # Sooty tall grass
+    when PBTerrain::Puddle;     return PBEnvironment::StillWater
     end
-    return PBEnvironment::None
   end
+  return PBEnvironment::None
 end
 
 def pbGenerateWildPokemon(species,level,isroamer=false)
@@ -1134,7 +1137,7 @@ def pbEncounter(enctype)
     return false if !encounter
     $PokemonTemp.encounterType=enctype
     pbWildBattle(encounter[0],encounter[1])
-	  $PokemonTemp.encounterType=-1
+    $PokemonTemp.encounterType=-1
     return true
   end
 end
@@ -2426,11 +2429,9 @@ def pbMoveRoute(event,commands,waitComplete=false)
   route.list.push(RPG::MoveCommand.new(PBMoveRoute::ThroughOn))
   i=0; while i<commands.length
     case commands[i]
-    when PBMoveRoute::Wait, PBMoveRoute::SwitchOn,
-       PBMoveRoute::SwitchOff, PBMoveRoute::ChangeSpeed,
-       PBMoveRoute::ChangeFreq, PBMoveRoute::Opacity,
-       PBMoveRoute::Blending, PBMoveRoute::PlaySE,
-       PBMoveRoute::Script
+    when PBMoveRoute::Wait, PBMoveRoute::SwitchOn, PBMoveRoute::SwitchOff,
+       PBMoveRoute::ChangeSpeed, PBMoveRoute::ChangeFreq, PBMoveRoute::Opacity,
+       PBMoveRoute::Blending, PBMoveRoute::PlaySE, PBMoveRoute::Script
       route.list.push(RPG::MoveCommand.new(commands[i],[commands[i+1]]))
       i+=1
     when PBMoveRoute::ScriptAsync

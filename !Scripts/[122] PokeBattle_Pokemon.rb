@@ -134,7 +134,9 @@ class PokeBattle_Pokemon
   def isEgg?
     return @eggsteps>0
   end
-  
+
+  def egg?; return isEgg?; end
+
 # Returns this Pokemon's growth rate.
   def growthrate
     dexdata=pbOpenDexData
@@ -245,6 +247,19 @@ class PokeBattle_Pokemon
     return ret1
   end
 
+# Returns whether this Pokémon has a particular ability.
+  def hasAbility?(value=0)
+    if value==0
+      return self.ability>0
+    else
+      if value.is_a?(String) || value.is_a?(Symbol)
+        value=getID(PBAbilities,value)
+      end
+      return self.ability==value
+    end
+    return false
+  end
+
 # Sets this Pokémon's ability to a particular ability (if possible).
   def setAbility(value)
     @abilityflag=value
@@ -282,6 +297,19 @@ class PokeBattle_Pokemon
   def nature
     return @natureflag if @natureflag!=nil
     return @personalID%25
+  end
+
+# Returns whether this Pokémon has a particular nature.
+  def hasNature?(value=-1)
+    if value<0
+      return self.nature>=0
+    else
+      if value.is_a?(String) || value.is_a?(Symbol)
+        value=getID(PBNatures,value)
+      end
+      return self.nature==value
+    end
+    return false
   end
 
 # Sets this Pokémon's nature to a particular nature.
@@ -395,7 +423,7 @@ class PokeBattle_Pokemon
   end
 
 # Returns true if the Pokémon knows the given move.
-  def knowsMove?(move)
+  def hasMove?(move)
     if move.is_a?(String) || move.is_a?(Symbol)
       move=getID(PBMoves,move)
     end
@@ -405,6 +433,8 @@ class PokeBattle_Pokemon
     end
     return false
   end
+
+  def knowsMove?(move); return self.hasMove?(move); end
 
 # Returns the list of moves this Pokémon can learn by levelling up.
   def getMoveList
@@ -942,6 +972,10 @@ class PokeBattle_Pokemon
         moveid=(i>=movelist.length) ? 0 : movelist[i]
         @moves[j]=PBMove.new(moveid)
         j+=1
+      end
+    else
+      for i in 0...4
+        @moves[i]=PBMove.new(0)
       end
     end
   end

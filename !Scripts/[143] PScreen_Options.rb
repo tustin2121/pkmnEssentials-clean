@@ -484,8 +484,10 @@ class PokemonOptionScene
        EnumOption.new(_INTL("Running Key"),[_INTL("Hold"),_INTL("Toggle")],
           proc { $PokemonSystem.runstyle },
           proc {|value|
-             $PokemonSystem.runstyle=value
-             $PokemonGlobal.runtoggle=false if $PokemonGlobal
+             if $PokemonSystem.runstyle!=value
+               $PokemonSystem.runstyle=value
+               $PokemonGlobal.runtoggle=false if $PokemonGlobal
+             end
           }
        ),
        NumberOption.new(_INTL("Speech Frame"),1,$SpeechFrames.length,

@@ -22,7 +22,7 @@ class PokeBattle_Pokemon
 
   def makeUnmega
     v=MultipleForms.call("getUnmegaForm",self)
-    self.form=(v!=nil) ? v : 0
+    self.form=v if v!=nil
   end
 
   def megaName
@@ -52,7 +52,7 @@ class PokeBattle_Pokemon
 
   def makeUnprimal
     v=MultipleForms.call("getUnprimalForm",self)
-    self.form=(v!=nil) ? v : 0
+    self.form=v if v!=nil
   end
 end
 
@@ -974,7 +974,7 @@ MultipleForms.register(:LATIOS,{
 
 MultipleForms.register(:RAYQUAZA,{
 "getMegaForm"=>proc{|pokemon|
-   next 1 if pokemon.knowsMove?(:DRAGONASCENT)
+   next 1 if pokemon.hasMove?(:DRAGONASCENT)
    next
 },
 "megaMessage"=>proc{|pokemon|

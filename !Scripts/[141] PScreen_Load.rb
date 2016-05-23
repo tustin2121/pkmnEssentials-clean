@@ -322,6 +322,7 @@ class PokemonLoad
     @scene.pbStartScene(commands,showContinue,trainer,framecount,mapid)
     @scene.pbSetParty(trainer) if showContinue
     @scene.pbStartScene2
+    $ItemData = readItemList("Data/items.dat")
     loop do
       command=@scene.pbChoose(commands)
       if cmdContinue>=0 && command==cmdContinue
@@ -347,7 +348,6 @@ class PokemonLoad
            $game_player         = Marshal.load(f)
            $PokemonGlobal       = Marshal.load(f)
            metadata             = Marshal.load(f)
-           $ItemData            = readItemList("Data/items.dat")
            $PokemonBag          = Marshal.load(f)
            $PokemonStorage      = Marshal.load(f)
            magicNumberMatches=false
@@ -415,7 +415,6 @@ class PokemonLoad
         $game_self_switches  = Game_SelfSwitches.new
         $game_screen         = Game_Screen.new
         $game_player         = Game_Player.new
-        $ItemData            = readItemList("Data/items.dat")
         $PokemonMap          = PokemonMapMetadata.new
         $PokemonGlobal       = PokemonGlobalMetadata.new
         $PokemonStorage      = PokemonStorage.new

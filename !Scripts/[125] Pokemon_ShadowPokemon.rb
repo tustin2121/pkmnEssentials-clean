@@ -734,18 +734,17 @@ end
 # User takes recoil damage equal to 1/2 of its current HP. (Shadow End)
 ################################################################################
 class PokeBattle_Move_130 < PokeBattle_Move
-  def isRecoilMove?
-    return true
-  end
-
   def pbEffect(attacker,opponent,hitnum=0,alltargets=nil,showanimation=true)
     ret=super(attacker,opponent,hitnum,alltargets,showanimation)
-    if opponent.damagestate.calcdamage>0 && !opponent.damagestate.substitute
-      attacker.pbReduceHP([1,((attacker.hp+1)/2).floor].max)
-      @battle.pbDisplay(_INTL("{1} is damaged by the recoil!",attacker.pbThis))
-    end
     attacker.pbHyperMode if ret>=0
     return ret
+  end
+
+  def pbEffectAfterHit(attacker,opponent,turneffects)
+    if !attacker.isFainted? && turneffects[PBEffects::TotalDamage]>0
+      attacker.pbReduceHP((attacker.hp/2.0).round)
+      @battle.pbDisplay(_INTL("{1} is damaged by recoil!",attacker.pbThis))
+    end
   end
 end
 

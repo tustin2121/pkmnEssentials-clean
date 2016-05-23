@@ -25,7 +25,7 @@ class PokeBattle_Battler
         return false
       end
     end
-    if attacker.hasMoldBreaker || !hasWorkingAbility(:SOUNDPROOF)
+    if (attacker && attacker.hasMoldBreaker) || !hasWorkingAbility(:SOUNDPROOF)
       for i in 0...4
         if @battle.battlers[i].effects[PBEffects::Uproar]>0
           @battle.pbDisplay(_INTL("But the uproar kept {1} awake!",pbThis(true))) if showMessages
@@ -851,11 +851,11 @@ class PokeBattle_Battler
            _INTL("{1}'s {2} severely fell!",pbThis,PBStats.getName(stat))]
         @battle.pbDisplay(arrStatTexts[[increment-1,2].min])
         # Defiant
-        if hasWorkingAbility(:DEFIANT) && (!attacker || attacker.pbIsOpposing?(self))
+        if hasWorkingAbility(:DEFIANT) && (!attacker || attacker.pbIsOpposing?(self.index))
           pbIncreaseStatWithCause(PBStats::ATTACK,2,self,PBAbilities.getName(self.ability))
         end
         # Competitive
-        if hasWorkingAbility(:COMPETITIVE) && (!attacker || attacker.pbIsOpposing?(self))
+        if hasWorkingAbility(:COMPETITIVE) && (!attacker || attacker.pbIsOpposing?(self.index))
           pbIncreaseStatWithCause(PBStats::SPATK,2,self,PBAbilities.getName(self.ability))
         end
         return true
@@ -894,11 +894,11 @@ class PokeBattle_Battler
         end
         @battle.pbDisplay(arrStatTexts[[increment-1,2].min]) if showmessage
         # Defiant
-        if hasWorkingAbility(:DEFIANT) && (!attacker || attacker.pbIsOpposing?(self))
+        if hasWorkingAbility(:DEFIANT) && (!attacker || attacker.pbIsOpposing?(self.index))
           pbIncreaseStatWithCause(PBStats::ATTACK,2,self,PBAbilities.getName(self.ability))
         end
         # Competitive
-        if hasWorkingAbility(:COMPETITIVE) && (!attacker || attacker.pbIsOpposing?(self))
+        if hasWorkingAbility(:COMPETITIVE) && (!attacker || attacker.pbIsOpposing?(self.index))
           pbIncreaseStatWithCause(PBStats::SPATK,2,self,PBAbilities.getName(self.ability))
         end
         return true

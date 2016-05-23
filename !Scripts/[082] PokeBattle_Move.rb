@@ -77,17 +77,19 @@ class PokeBattle_Move
 
   def pbModifyType(type,attacker,opponent)
     if type>=0
-      if attacker.hasWorkingAbility(:NORMALIZE)
-        type=getConst(PBTypes,:NORMAL) || 0
-      elsif attacker.hasWorkingAbility(:AERILATE)
-        type=getConst(PBTypes,:FLYING) || 0
-        @powerboost=true
-      elsif attacker.hasWorkingAbility(:REFRIGERATE)
-        type=getConst(PBTypes,:ICE) || 0
-        @powerboost=true
-      elsif attacker.hasWorkingAbility(:PIXILATE)
-        type=getConst(PBTypes,:FAIRY) || 0
-        @powerboost=true
+      if attacker.hasWorkingAbility(:NORMALIZE) && hasConst?(PBTypes,:NORMAL)
+        type=getConst(PBTypes,:NORMAL)
+      elsif isConst?(type,PBTypes,:NORMAL)
+        if attacker.hasWorkingAbility(:AERILATE) && hasConst?(PBTypes,:FLYING)
+          type=getConst(PBTypes,:FLYING)
+          @powerboost=true
+        elsif attacker.hasWorkingAbility(:REFRIGERATE) && hasConst?(PBTypes,:ICE)
+          type=getConst(PBTypes,:ICE)
+          @powerboost=true
+        elsif attacker.hasWorkingAbility(:PIXILATE) && hasConst?(PBTypes,:FAIRY)
+          type=getConst(PBTypes,:FAIRY)
+          @powerboost=true
+        end
       end
     end
     return type
@@ -96,13 +98,13 @@ class PokeBattle_Move
   def pbType(type,attacker,opponent)
     @powerboost=false
     type=pbModifyType(type,attacker,opponent)
-    if type>=0
+    if type>=0 && hasConst?(PBTypes,:ELECTRIC)
       if @battle.field.effects[PBEffects::IonDeluge] && isConst?(type,PBTypes,:NORMAL)
-        type=getConst(PBTypes,:ELECTRIC) || 0
+        type=getConst(PBTypes,:ELECTRIC)
         @powerboost=false
       end
       if attacker.effects[PBEffects::Electrify]
-        type=getConst(PBTypes,:ELECTRIC) || 0
+        type=getConst(PBTypes,:ELECTRIC)
         @powerboost=false
       end
     end
@@ -159,13 +161,15 @@ class PokeBattle_Move
     # Parental Bond goes here (for single target moves only)
     if attacker.hasWorkingAbility(:PARENTALBOND)
       if pbIsDamaging? && !pbTargetsMultiple?(attacker) &&
-         !pbIsMultiHit && !pbTwoTurnAttack(attacker) &&
-         [0x6E,                     # Endeavor
-          0xE0,                     # Selfdestruct/Explosion
-          0xE1,                     # Final Gambit
-          0xF7].include?(@function) # Fling
-        attacker.effects[PBEffects::ParentalBond]=3
-        return 2
+         !pbIsMultiHit && !pbTwoTurnAttack(attacker)
+        exceptions=[0x6E,   # Endeavor
+                    0xE0,   # Selfdestruct/Explosion
+                    0xE1,   # Final Gambit
+                    0xF7]   # Fling
+        if !exceptions.include?(@function)
+          attacker.effects[PBEffects::ParentalBond]=3
+          return 2
+        end
       end
     end
     # Need to record that Parental Bond applies, to weaken the second attack
@@ -382,8 +386,7 @@ class PokeBattle_Move
       mod3=2 if mod3==0
     end
     # Foresight
-    if attacker.hasWorkingAbility(:SCRAPPY) ||
-       opponent.effects[PBEffects::Foresight]
+    if attacker.hasWorkingAbility(:SCRAPPY) || opponent.effects[PBEffects::Foresight]
       mod1=2 if isConst?(otype1,PBTypes,:GHOST) && PBTypes.isIneffective?(atype,otype1)
       mod2=2 if isConst?(otype2,PBTypes,:GHOST) && PBTypes.isIneffective?(atype,otype2)
       mod3=2 if isConst?(otype3,PBTypes,:GHOST) && PBTypes.isIneffective?(atype,otype3)
@@ -401,11 +404,11 @@ class PokeBattle_Move
       mod3=2 if isConst?(otype3,PBTypes,:FLYING) && PBTypes.isSuperEffective?(atype,otype3)
     end
     # Smack Down makes Ground moves work against fliers
-    if !opponent.isAirborne?(attacker.hasMoldBreaker) ||
-       @function==0x11C # Smack Down
-      mod1=2 if isConst?(otype1,PBTypes,:FLYING) && isConst?(atype,PBTypes,:GROUND)
-      mod2=2 if isConst?(otype2,PBTypes,:FLYING) && isConst?(atype,PBTypes,:GROUND)
-      mod3=2 if isConst?(otype3,PBTypes,:FLYING) && isConst?(atype,PBTypes,:GROUND)
+    if (!opponent.isAirborne?(attacker.hasMoldBreaker) || @function==0x11C) && # Smack Down
+       isConst?(atype,PBTypes,:GROUND)
+      mod1=2 if isConst?(otype1,PBTypes,:FLYING)
+      mod2=2 if isConst?(otype2,PBTypes,:FLYING)
+      mod3=2 if isConst?(otype3,PBTypes,:FLYING)
     end
     if @function==0x135 && !attacker.effects[PBEffects::Electrify] # Freeze-Dry
       mod1=4 if isConst?(otype1,PBTypes,:WATER)
@@ -1102,6 +1105,7 @@ class PokeBattle_Move
       finaldamagemult=(finaldamagemult*1.2).round
     end
     if attacker.hasWorkingItem(:LIFEORB) && (options&SELFCONFUSE)==0
+      attacker.effects[PBEffects::LifeOrb]=true
       finaldamagemult=(finaldamagemult*1.3).round
     end
     if opponent.damagestate.typemod>8 && (options&IGNOREPKMNTYPES)==0
@@ -1282,9 +1286,6 @@ class PokeBattle_Move
   end
 
   def pbAddTarget(targets,attacker)
-  end
-
-  def pbSuccessCheck(attacker,opponent,numtargets)
   end
 
   def pbDisplayUseMessage(attacker)

@@ -2416,6 +2416,245 @@ class PokeBattle_Battle
       else
         score-=110
       end
+    when 0x133, 0x134
+      score-=95
+      if skill>=PBTrainerAI.highSkill
+        score=0
+      end
+    when 0x135
+      if opponent.pbCanFreeze?(attacker,false)
+        score+=30
+        if skill>=PBTrainerAI.highSkill
+          score-=20 if opponent.hasWorkingAbility(:MARVELSCALE)
+        end
+      end
+    when 0x136
+      score+=20 if attacker.stages[PBStats::DEFENSE]<0
+    when 0x137
+      if attacker.pbTooHigh?(PBStats::DEFENSE) &&
+         attacker.pbTooHigh?(PBStats::SPDEF) &&
+         !attacker.pbPartner.isFainted? &&
+         attacker.pbPartner.pbTooHigh?(PBStats::DEFENSE) &&
+         attacker.pbPartner.pbTooHigh?(PBStats::SPDEF)
+        score-=90
+      else
+        score-=attacker.stages[PBStats::DEFENSE]*10
+        score-=attacker.stages[PBStats::SPDEF]*10
+        if !attacker.pbPartner.isFainted?
+          score-=attacker.pbPartner.stages[PBStats::DEFENSE]*10
+          score-=attacker.pbPartner.stages[PBStats::SPDEF]*10
+        end
+      end
+    when 0x138
+      if !@doublebattle
+        score-=100
+      elsif attacker.pbPartner.isFainted?
+        score-=90
+      else
+        score-=attacker.pbPartner.stages[PBStats::SPDEF]*10
+      end
+    when 0x139
+      if !opponent.pbCanReduceStatStage?(PBStats::ATTACK,attacker)
+        score-=90
+      else
+        score+=opponent.stages[PBStats::ATTACK]*20
+        if skill>=PBTrainerAI.mediumSkill
+          hasphysicalattack=false
+          for thismove in opponent.moves
+            if thismove.id!=0 && thismove.basedamage>0 &&
+               thismove.pbIsPhysical?(thismove.type)
+              hasphysicalattack=true
+            end
+          end
+          if hasphysicalattack
+            score+=20
+          elsif skill>=PBTrainerAI.highSkill
+            score-=90
+          end
+        end
+      end
+    when 0x13A
+      avg=opponent.stages[PBStats::ATTACK]*10
+      avg+=opponent.stages[PBStats::SPATK]*10
+      score+=avg/2
+    when 0x13B
+      if !isConst?(attacker.species,PBSpecies,:HOOPA) || attacker.form!=1
+        score-=100
+      else
+        score+=20 if opponent.stages[PBStats::DEFENSE]>0
+      end
+    when 0x13C
+      score+=20 if opponent.stages[PBStats::SPATK]>0
+    when 0x13D
+      if !opponent.pbCanReduceStatStage?(PBStats::SPATK,attacker)
+        score-=90
+      else
+        score+=40 if attacker.turncount==0
+        score+=opponent.stages[PBStats::SPATK]*20
+      end
+    when 0x13E
+      count=0
+      for i in 0...4
+        battler=@battlers[i]
+        if battler.pbHasType?(:GRASS) && !battler.isAirborne? &&
+           (!battler.pbTooHigh?(PBStats::ATTACK) || !battler.pbTooHigh?(PBStats::SPATK))
+          count+=1
+          if attacker.pbIsOpposing?(battler)
+            score-=20
+          else
+            score-=attacker.stages[PBStats::ATTACK]*10
+            score-=attacker.stages[PBStats::SPATK]*10
+          end
+        end
+      end
+      score-=95 if count==0
+    when 0x13F
+      count=0
+      for i in 0...4
+        battler=@battlers[i]
+        if battler.pbHasType?(:GRASS) && !battler.pbTooHigh?(PBStats::DEFENSE)
+          count+=1
+          if attacker.pbIsOpposing?(battler)
+            score-=20
+          else
+            score-=attacker.stages[PBStats::DEFENSE]*10
+          end
+        end
+      end
+      score-=95 if count==0
+    when 0x140
+      count=0
+      for i in 0...4
+        battler=@battlers[i]
+        if battler.status==PBStatuses::POISON &&
+           (!battler.pbTooLow?(PBStats::ATTACK) ||
+           !battler.pbTooLow?(PBStats::SPATK) ||
+           !battler.pbTooLow?(PBStats::SPEED))
+          count+=1
+          if attacker.pbIsOpposing?(battler)
+            score+=attacker.stages[PBStats::ATTACK]*10
+            score+=attacker.stages[PBStats::SPATK]*10
+            score+=attacker.stages[PBStats::SPEED]*10
+          else
+            score-=20
+          end
+        end
+      end
+      score-=95 if count==0
+    when 0x141
+      if opponent.effects[PBEffects::Substitute]>0
+        score-=90
+      else
+        numpos=0; numneg=0
+        for i in [PBStats::ATTACK,PBStats::DEFENSE,PBStats::SPEED,
+                  PBStats::SPATK,PBStats::SPDEF,PBStats::ACCURACY,PBStats::EVASION]
+          stat=opponent.stages[i]
+          (stat>0) ? numpos+=stat : numneg+=stat
+        end
+        if numpos!=0 || numneg!=0
+          score+=(numpos-numneg)*10
+        else
+          score-=95
+        end
+      end
+    when 0x142
+      if opponent.pbHasType?(:GHOST)
+        score-=90
+      end
+    when 0x143
+      if opponent.pbHasType?(:GRASS)
+        score-=90
+      end
+    when 0x144
+    when 0x145
+      aspeed=pbRoughStat(attacker,PBStats::SPEED,skill)
+      ospeed=pbRoughStat(opponent,PBStats::SPEED,skill)
+      if aspeed>ospeed
+        score-=90
+      end
+    when 0x146
+    when 0x147
+    when 0x148
+      aspeed=pbRoughStat(attacker,PBStats::SPEED,skill)
+      ospeed=pbRoughStat(opponent,PBStats::SPEED,skill)
+      if aspeed>ospeed
+        score-=90
+      else
+        score+=30 if opponent.pbHasMoveType?(:FIRE)
+      end
+    when 0x149
+      if attacker.turncount==0
+        score+=30
+      else
+        score-=90 # Because it will fail here
+        score=0 if skill>=PBTrainerAI.bestSkill
+      end
+    when 0x14A
+    when 0x14B, 0x14C
+      if attacker.effects[PBEffects::ProtectRate]>1 ||
+         opponent.effects[PBEffects::HyperBeam]>0
+        score-=90
+      else
+        if skill>=PBTrainerAI.mediumSkill
+          score-=(attacker.effects[PBEffects::ProtectRate]*40)
+        end
+        score+=50 if attacker.turncount==0
+        score+=30 if opponent.effects[PBEffects::TwoTurnAttack]!=0
+      end
+    when 0x14D
+    when 0x14E
+      if attacker.pbTooHigh?(PBStats::SPATK) &&
+         attacker.pbTooHigh?(PBStats::SPDEF) &&
+         attacker.pbTooHigh?(PBStats::SPEED)
+        score-=90
+      else
+        score-=attacker.stages[PBStats::SPATK]*10 # Only *10 isntead of *20
+        score-=attacker.stages[PBStats::SPDEF]*10 # because two-turn attack
+        score-=attacker.stages[PBStats::SPEED]*10
+        if skill>=PBTrainerAI.mediumSkill
+          hasspecialattack=false
+          for thismove in attacker.moves
+            if thismove.id!=0 && thismove.basedamage>0 &&
+               thismove.pbIsSpecial?(thismove.type)
+              hasspecialattack=true
+            end
+          end
+          if hasspecialattack
+            score+=20
+          elsif skill>=PBTrainerAI.highSkill
+            score-=90
+          end
+        end
+        if skill>=PBTrainerAI.highSkill
+          aspeed=pbRoughStat(attacker,PBStats::SPEED,skill)
+          ospeed=pbRoughStat(opponent,PBStats::SPEED,skill)
+          if aspeed<ospeed && aspeed*2>ospeed
+            score+=30
+          end
+        end
+      end
+    when 0x14F
+      if skill>=PBTrainerAI.highSkill && opponent.hasWorkingAbility(:LIQUIDOOZE)
+        score-=80
+      else
+        score+=40 if attacker.hp<=(attacker.totalhp/2)
+      end
+    when 0x150
+      score+=20 if !attacker.pbTooHigh?(:ATTACK) && opponent.hp<=(opponent.totalhp/4)
+    when 0x151
+      avg=opponent.stages[PBStats::ATTACK]*10
+      avg+=opponent.stages[PBStats::SPATK]*10
+      score+=avg/2
+    when 0x152
+    when 0x153
+      score-=95 if opponent.pbOwnSide.effects[PBEffects::StickyWeb]
+    when 0x154
+    when 0x155
+    when 0x156
+    when 0x157
+      score-=90
+    when 0x158
+      score-=90 if !attacker.pokemon || !attacker.pokemon.belch
     end
     # A score of 0 here means it should absolutely not be used
     return score if score<=0
@@ -2455,8 +2694,7 @@ class PokeBattle_Battle
                              move.function==0x95    # Magnitude
           when 0xCB # Dive
             miss=true unless move.function==0x75 || # Surf
-                             move.function==0xD0 || # Whirlpool
-                             move.function==0x12D   # Shadow Storm
+                             move.function==0xD0    # Whirlpool
           when 0xCD # Shadow Force
             miss=true
           when 0xCE # Sky Drop
@@ -2466,6 +2704,8 @@ class PokeBattle_Battle
                              move.function==0x78 ||  # Twister
                              move.function==0x11B || # Sky Uppercut
                              move.function==0x11C    # Smack Down
+          when 0x14D # Phantom Force
+            miss=true
           end
           if opponent.effects[PBEffects::SkyDrop]
             miss=true unless move.function==0x08 ||  # Thunder
@@ -2625,11 +2865,12 @@ class PokeBattle_Battle
   def pbTypeModifier(type,attacker,opponent)
     return 8 if type<0
     return 8 if isConst?(type,PBTypes,:GROUND) && opponent.pbHasType?(:FLYING) &&
-                opponent.hasWorkingItem(:IRONBALL)
+                opponent.hasWorkingItem(:IRONBALL) && !USENEWBATTLEMECHANICS
     atype=type
     otype1=opponent.type1
     otype2=opponent.type2
     otype3=opponent.effects[PBEffects::Type3] || -1
+    # Roost
     if isConst?(otype1,PBTypes,:FLYING) && opponent.effects[PBEffects::Roost]
       if isConst?(otype2,PBTypes,:FLYING) && isConst?(otype3,PBTypes,:FLYING)
         otype1=getConst(PBTypes,:NORMAL) || 0
@@ -2640,59 +2881,65 @@ class PokeBattle_Battle
     if isConst?(otype2,PBTypes,:FLYING) && opponent.effects[PBEffects::Roost]
       otype2=otype1
     end
+    # Get effectivenesses
     mod1=PBTypes.getEffectiveness(atype,otype1)
     mod2=(otype1==otype2) ? 2 : PBTypes.getEffectiveness(atype,otype2)
-    mod3=(otype1==otype3 || otype2==otype3) ? 2 : PBTypes.getEffectiveness(atype,otype3)
+    mod3=(otype3<0 || otype1==otype3 || otype2==otype3) ? 2 : PBTypes.getEffectiveness(atype,otype3)
     if opponent.hasWorkingItem(:RINGTARGET)
       mod1=2 if mod1==0
       mod2=2 if mod2==0
       mod3=2 if mod3==0
     end
-    if attacker.hasWorkingAbility(:SCRAPPY) ||
-       opponent.effects[PBEffects::Foresight]
-      mod1=2 if isConst?(otype1,PBTypes,:GHOST) &&
-        (isConst?(atype,PBTypes,:NORMAL) || isConst?(atype,PBTypes,:FIGHTING))
-      mod2=2 if isConst?(otype2,PBTypes,:GHOST) &&
-        (isConst?(atype,PBTypes,:NORMAL) || isConst?(atype,PBTypes,:FIGHTING))
-      mod3=2 if isConst?(otype3,PBTypes,:GHOST) &&
-        (isConst?(atype,PBTypes,:NORMAL) || isConst?(atype,PBTypes,:FIGHTING))
+    # Foresight
+    if (attacker.hasWorkingAbility(:SCRAPPY) rescue false) || opponent.effects[PBEffects::Foresight]
+      mod1=2 if isConst?(otype1,PBTypes,:GHOST) && PBTypes.isIneffective?(atype,otype1)
+      mod2=2 if isConst?(otype2,PBTypes,:GHOST) && PBTypes.isIneffective?(atype,otype2)
+      mod3=2 if isConst?(otype3,PBTypes,:GHOST) && PBTypes.isIneffective?(atype,otype3)
     end
+    # Miracle Eye
     if opponent.effects[PBEffects::MiracleEye]
-      mod1=2 if isConst?(otype1,PBTypes,:DARK) && isConst?(atype,PBTypes,:PSYCHIC)
-      mod2=2 if isConst?(otype2,PBTypes,:DARK) && isConst?(atype,PBTypes,:PSYCHIC)
-      mod3=2 if isConst?(otype3,PBTypes,:DARK) && isConst?(atype,PBTypes,:PSYCHIC)
+      mod1=2 if isConst?(otype1,PBTypes,:DARK) && PBTypes.isIneffective?(atype,otype1)
+      mod2=2 if isConst?(otype2,PBTypes,:DARK) && PBTypes.isIneffective?(atype,otype2)
+      mod3=2 if isConst?(otype3,PBTypes,:DARK) && PBTypes.isIneffective?(atype,otype3)
     end
-    if !opponent.isAirborne?
-      mod1=2 if isConst?(otype1,PBTypes,:FLYING) && isConst?(atype,PBTypes,:GROUND)
-      mod2=2 if isConst?(otype2,PBTypes,:FLYING) && isConst?(atype,PBTypes,:GROUND)
-      mod3=2 if isConst?(otype3,PBTypes,:FLYING) && isConst?(atype,PBTypes,:GROUND)
+    # Delta Stream's weather
+    if pbWeather==PBWeather::STRONGWINDS
+      mod1=2 if isConst?(otype1,PBTypes,:FLYING) && PBTypes.isSuperEffective?(atype,otype1)
+      mod2=2 if isConst?(otype2,PBTypes,:FLYING) && PBTypes.isSuperEffective?(atype,otype2)
+      mod3=2 if isConst?(otype3,PBTypes,:FLYING) && PBTypes.isSuperEffective?(atype,otype3)
+    end
+    # Smack Down makes Ground moves work against fliers
+    if !opponent.isAirborne?((attacker.hasMoldBreaker rescue false)) && isConst?(atype,PBTypes,:GROUND)
+      mod1=2 if isConst?(otype1,PBTypes,:FLYING)
+      mod2=2 if isConst?(otype2,PBTypes,:FLYING)
+      mod3=2 if isConst?(otype3,PBTypes,:FLYING)
     end
     return mod1*mod2*mod3
   end
 
   def pbTypeModifier2(battlerThis,battlerOther)
+    # battlerThis isn't a Battler object, it's a Pokémon - it has no third type
     if battlerThis.type1==battlerThis.type2
       return 4*pbTypeModifier(battlerThis.type1,battlerThis,battlerOther)
-    else
-      ret=pbTypeModifier(battlerThis.type1,battlerThis,battlerOther)
-      ret*=pbTypeModifier(battlerThis.type2,battlerThis,battlerOther)
-      return ret # 0,1,2,4,8,_16_,32,64,128,256
     end
+    ret=pbTypeModifier(battlerThis.type1,battlerThis,battlerOther)
+    ret*=pbTypeModifier(battlerThis.type2,battlerThis,battlerOther)
+    return ret*2 # 0,1,2,4,_8_,16,32,64
   end
 
   def pbRoughStat(battler,stat,skill)
-    if skill>=PBTrainerAI.highSkill && stat==PBStats::SPEED
-      return battler.pbSpeed
-    end
+    return battler.pbSpeed if skill>=PBTrainerAI.highSkill && stat==PBStats::SPEED
     stagemul=[2,2,2,2,2,2,2,3,4,5,6,7,8]
     stagediv=[8,7,6,5,4,3,2,2,2,2,2,2,2]
     stage=battler.stages[stat]+6
     value=0
-    value=battler.attack if stat==PBStats::ATTACK
-    value=battler.defense if stat==PBStats::DEFENSE
-    value=battler.speed if stat==PBStats::SPEED
-    value=battler.spatk if stat==PBStats::SPATK
-    value=battler.spdef if stat==PBStats::SPDEF
+    case stat
+    when PBStats::ATTACK; value=battler.attack
+    when PBStats::DEFENSE; value=battler.defense
+    when PBStats::SPEED; value=battler.speed
+    when PBStats::SPATK; value=battler.spatk
+    when PBStats::SPDEF; value=battler.spdef
+    end
     return (value*1.0*stagemul[stage]/stagediv[stage]).floor
   end
 
@@ -2886,6 +3133,13 @@ class PokeBattle_Battle
       #TODO
     when 0x113 # Spit Up
       basedamage*=attacker.effects[PBEffects::Stockpile]
+    when 0x144
+      type=getConst(PBTypes,:FLYING) || -1
+      if type>=0
+        mult=PBTypes.getCombinedEffectiveness(type,
+           opponent.type1,opponent.type2,opponent.effects[PBEffects::Type3])
+        basedamage=((basedamage*mult)/8).round
+      end
     end
     return basedamage
   end
@@ -3965,7 +4219,7 @@ class PokeBattle_Battle
           end
           if movetype>=0 && pbTypeModifier(movetype,@battlers[index],@battlers[index])==0
             weight=65
-            if pbTypeModifier2(party[i],@battlers[index].pbOppositeOpposing)<16
+            if pbTypeModifier2(party[i],@battlers[index].pbOppositeOpposing)>8
               # Greater weight if new Pokemon's type is effective against opponent
               weight=85
             end
@@ -3974,7 +4228,7 @@ class PokeBattle_Battle
             end
           elsif movetype>=0 && pbTypeModifier(movetype,@battlers[index],@battlers[index])<8
             weight=40
-            if pbTypeModifier2(party[i],@battlers[index].pbOppositeOpposing)<16
+            if pbTypeModifier2(party[i],@battlers[index].pbOppositeOpposing)>8
               # Greater weight if new Pokemon's type is effective against opponent
               weight=60
             end
@@ -4030,10 +4284,10 @@ class PokeBattle_Battle
         md=PBMoveData.new(move.id)
         next if md.basedamage==0
         if o1
-          sum+=PBTypes.getCombinedEffectiveness(md.type,o1.type1,o1.type2)
+          sum+=PBTypes.getCombinedEffectiveness(md.type,o1.type1,o1.type2,o1.effects[PBEffects::Type3])
         end
         if o2
-          sum+=PBTypes.getCombinedEffectiveness(md.type,o2.type1,o2.type2)
+          sum+=PBTypes.getCombinedEffectiveness(md.type,o2.type1,o2.type2,o2.effects[PBEffects::Type3])
         end
       end
       if best==-1 || sum>bestSum

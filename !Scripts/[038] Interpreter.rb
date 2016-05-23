@@ -258,7 +258,7 @@ class Interpreter
            if line[/^\s*\(/]
              message+="\r\n***Line '#{line}' shouldn't begin with '('. Try\r\n"
              message+="putting the '(' at the end of the previous line instead,\r\n"
-             message+="or using Extendtext."
+             message+="or using 'extendtext.exe'."
            end
         }
       else

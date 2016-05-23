@@ -21,36 +21,41 @@ class PBTypes
   end
 
   def PBTypes.getEffectiveness(attackType,opponentType)
+    return 2 if !opponentType || opponentType<0
     return PBTypes.loadTypeData()[2][attackType*(PBTypes.maxValue+1)+opponentType]
   end
 
-  def PBTypes.getCombinedEffectiveness(attackType,opponentType1,opponentType2=nil)
-    if opponentType2==nil || opponentType1==opponentType2
-      return PBTypes.getEffectiveness(attackType,opponentType1)*2
-    else
-      mod1=PBTypes.getEffectiveness(attackType,opponentType1)
+  def PBTypes.getCombinedEffectiveness(attackType,opponentType1,opponentType2=nil,opponentType3=nil)
+    mod1=PBTypes.getEffectiveness(attackType,opponentType1)
+    mod2=2
+    if opponentType2!=nil && opponentType2>=0 && opponentType1!=opponentType2
       mod2=PBTypes.getEffectiveness(attackType,opponentType2)
-      return (mod1*mod2)
     end
+    mod3=2
+    if opponentType3!=nil && opponentType3>=0 &&
+       opponentType1!=opponentType3 && opponentType2!=opponentType3
+      mod3=PBTypes.getEffectiveness(attackType,opponentType3)
+    end
+    return (mod1*mod2*mod3)
   end
 
-  def PBTypes.isIneffective?(attackType,opponentType1,opponentType2=nil)
-    e=PBTypes.getCombinedEffectiveness(attackType,opponentType1,opponentType2)
+  def PBTypes.isIneffective?(attackType,opponentType1,opponentType2=nil,opponentType3=nil)
+    e=PBTypes.getCombinedEffectiveness(attackType,opponentType1,opponentType2,opponentType3)
     return e==0
   end
 
-  def PBTypes.isNotVeryEffective?(attackType,opponentType1,opponentType2=nil)
-    e=PBTypes.getCombinedEffectiveness(attackType,opponentType1,opponentType2)
-    return e>0 && e<4
+  def PBTypes.isNotVeryEffective?(attackType,opponentType1,opponentType2=nil,opponentType3=nil)
+    e=PBTypes.getCombinedEffectiveness(attackType,opponentType1,opponentType2,opponentType3)
+    return e>0 && e<8
   end
 
-  def PBTypes.isNormalEffective?(attackType,opponentType1,opponentType2=nil)
-    e=PBTypes.getCombinedEffectiveness(attackType,opponentType1,opponentType2)
-    return e==4
+  def PBTypes.isNormalEffective?(attackType,opponentType1,opponentType2=nil,opponentType3=nil)
+    e=PBTypes.getCombinedEffectiveness(attackType,opponentType1,opponentType2,opponentType3)
+    return e==8
   end
 
-  def PBTypes.isSuperEffective?(attackType,opponentType1,opponentType2=nil)
-    e=PBTypes.getCombinedEffectiveness(attackType,opponentType1,opponentType2)
-    return e>4
+  def PBTypes.isSuperEffective?(attackType,opponentType1,opponentType2=nil,opponentType3=nil)
+    e=PBTypes.getCombinedEffectiveness(attackType,opponentType1,opponentType2,opponentType3)
+    return e>8
   end
 end

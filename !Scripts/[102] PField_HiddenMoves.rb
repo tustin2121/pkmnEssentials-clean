@@ -338,7 +338,7 @@ def Kernel.pbHeadbutt(event)
   if $DEBUG || movefinder
     if Kernel.pbConfirmMessage(_INTL("A Pokémon could be in this tree. Would you like to use Headbutt?"))
       speciesname=!movefinder ? $Trainer.name : movefinder.name
-      Kernel.pbMessage(_INTL("{1} used Headbutt.",speciesname))
+      Kernel.pbMessage(_INTL("{1} used Headbutt!",speciesname))
       pbHiddenMoveAnimation(movefinder)
       Kernel.pbHeadbuttEffect(event)
     end
@@ -360,7 +360,7 @@ HiddenMoveHandlers::CanUseMove.add(:HEADBUTT,proc{|move,pkmn|
 
 HiddenMoveHandlers::UseMove.add(:HEADBUTT,proc{|move,pokemon|
    if !pbHiddenMoveAnimation(pokemon)
-     Kernel.pbMessage(_INTL("{1} used {2}.",pokemon.name,PBMoves.getName(move)))
+     Kernel.pbMessage(_INTL("{1} used {2}!",pokemon.name,PBMoves.getName(move)))
    end
    facingEvent=$game_player.pbFacingEvent
    Kernel.pbHeadbuttEffect(facingEvent)
@@ -407,7 +407,7 @@ HiddenMoveHandlers::CanUseMove.add(:ROCKSMASH,proc{|move,pkmn|
      Kernel.pbMessage(_INTL("Can't use that here."))
      return false
    end
-   return true  
+   return true
 })
 
 HiddenMoveHandlers::UseMove.add(:ROCKSMASH,proc{|move,pokemon|
@@ -419,7 +419,7 @@ HiddenMoveHandlers::UseMove.add(:ROCKSMASH,proc{|move,pokemon|
      facingEvent.erase
      $PokemonMap.addErasedEvent(facingEvent.id)
    end
-   return true  
+   return true
 })
 
 #===============================================================================
@@ -470,15 +470,16 @@ HiddenMoveHandlers::CanUseMove.add(:STRENGTH,proc{|move,pkmn|
      Kernel.pbMessage(_INTL("Strength is already being used."))
      return false
    end
-   return true  
+   return true
 })
 
 HiddenMoveHandlers::UseMove.add(:STRENGTH,proc{|move,pokemon|
-   pbHiddenMoveAnimation(pokemon)
-   Kernel.pbMessage(_INTL("{1} used {2}!\1",pokemon.name,PBMoves.getName(move)))
+   if !pbHiddenMoveAnimation(pokemon)
+     Kernel.pbMessage(_INTL("{1} used {2}!\1",pokemon.name,PBMoves.getName(move)))
+   end
    Kernel.pbMessage(_INTL("{1}'s Strength made it possible to move boulders around!",pokemon.name))
    $PokemonMap.strengthUsed=true
-   return true  
+   return true
 })
 
 #===============================================================================
@@ -497,9 +498,7 @@ def Kernel.pbSurf
         Kernel.pbMessage(_INTL("{1} used Surf!",speciesname))
         pbHiddenMoveAnimation(movefinder)
         surfbgm=pbGetMetadata(0,MetadataSurfBGM)
-        if surfbgm
-          pbCueBGM(surfbgm,0.5)
-        end
+        pbCueBGM(surfbgm,0.5) if surfbgm
         pbStartSurfing()
         return true
       end
@@ -563,8 +562,6 @@ Events.onAction+=proc{|sender,e|
 }
 
 HiddenMoveHandlers::CanUseMove.add(:SURF,proc{|move,pkmn|
-   terrain=Kernel.pbFacingTerrainTag
-   notCliff=$game_map.passable?($game_player.x,$game_player.y,$game_player.direction)
    if !$DEBUG &&
       !(HIDDENMOVESCOUNTBADGES ? $Trainer.numbadges>=BADGEFORSURF : $Trainer.badges[BADGEFORSURF])
      Kernel.pbMessage(_INTL("Sorry, a new Badge is required."))
@@ -582,6 +579,8 @@ HiddenMoveHandlers::CanUseMove.add(:SURF,proc{|move,pkmn|
      Kernel.pbMessage(_INTL("Let's enjoy cycling!"))
      return false
    end
+   terrain=Kernel.pbFacingTerrainTag
+   notCliff=$game_map.passable?($game_player.x,$game_player.y,$game_player.direction)
    if !PBTerrain.isSurfable?(terrain) || !notCliff
      Kernel.pbMessage(_INTL("No surfing here!"))
      return false
@@ -590,9 +589,12 @@ HiddenMoveHandlers::CanUseMove.add(:SURF,proc{|move,pkmn|
 })
 
 HiddenMoveHandlers::UseMove.add(:SURF,proc{|move,pokemon|
+   $game_temp.in_menu=false
    if !pbHiddenMoveAnimation(pokemon)
      Kernel.pbMessage(_INTL("{1} used {2}!",pokemon.name,PBMoves.getName(move)))
    end
+   surfbgm=pbGetMetadata(0,MetadataSurfBGM)
+   pbCueBGM(surfbgm,0.5) if surfbgm
    pbStartSurfing()
    return true
 })
@@ -645,7 +647,7 @@ def Kernel.pbWaterfall
     if $DEBUG || movefinder
       if Kernel.pbConfirmMessage(_INTL("It's a large waterfall. Would you like to use Waterfall?"))
         speciesname=!movefinder ? $Trainer.name : movefinder.name
-        Kernel.pbMessage(_INTL("{1} used Waterfall.",speciesname))
+        Kernel.pbMessage(_INTL("{1} used Waterfall!",speciesname))
         pbHiddenMoveAnimation(movefinder)
         pbAscendWaterfall
         return true
@@ -687,7 +689,7 @@ HiddenMoveHandlers::CanUseMove.add(:WATERFALL,proc{|move,pkmn|
 
 HiddenMoveHandlers::UseMove.add(:WATERFALL,proc{|move,pokemon|
    if !pbHiddenMoveAnimation(pokemon)
-     Kernel.pbMessage(_INTL("{1} used {2}.",pokemon.name,PBMoves.getName(move)))
+     Kernel.pbMessage(_INTL("{1} used {2}!",pokemon.name,PBMoves.getName(move)))
    end
    Kernel.pbAscendWaterfall
    return true
@@ -705,7 +707,7 @@ def Kernel.pbDive
     if $DEBUG || movefinder
       if Kernel.pbConfirmMessage(_INTL("The sea is deep here. Would you like to use Dive?"))
         speciesname=!movefinder ? $Trainer.name : movefinder.name
-        Kernel.pbMessage(_INTL("{1} used Dive.",speciesname))
+        Kernel.pbMessage(_INTL("{1} used Dive!",speciesname))
         pbHiddenMoveAnimation(movefinder)
         pbFadeOutIn(99999){
            $game_temp.player_new_map_id=divemap
@@ -748,7 +750,7 @@ def Kernel.pbSurfacing
     (HIDDENMOVESCOUNTBADGES ? $Trainer.numbadges>=BADGEFORDIVE : $Trainer.badges[BADGEFORDIVE]) )
     if Kernel.pbConfirmMessage(_INTL("Light is filtering down from above. Would you like to use Dive?"))
       speciesname=!movefinder ? $Trainer.name : movefinder.name
-      Kernel.pbMessage(_INTL("{1} used Dive.",speciesname))
+      Kernel.pbMessage(_INTL("{1} used Dive!",speciesname))
       pbHiddenMoveAnimation(movefinder)
       pbFadeOutIn(99999){
          $game_temp.player_new_map_id=divemap
@@ -873,7 +875,7 @@ HiddenMoveHandlers::UseMove.add(:DIVE,proc{|move,pokemon|
    end
    return false if !divemap
    if !pbHiddenMoveAnimation(pokemon)
-     Kernel.pbMessage(_INTL("{1} used {2}.",pokemon.name,PBMoves.getName(move)))
+     Kernel.pbMessage(_INTL("{1} used {2}!",pokemon.name,PBMoves.getName(move)))
    end
    pbFadeOutIn(99999){
       $game_temp.player_new_map_id=divemap

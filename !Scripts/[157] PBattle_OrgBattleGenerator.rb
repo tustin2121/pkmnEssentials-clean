@@ -121,31 +121,31 @@ def pbGetLegalMoves2(species,maxlevel)
   end
   # Delete less powerful moves
   deleteAll=proc{|a,item|
-   	while a.include?(item)
-		  a.delete(item)
-  	end
+    while a.include?(item)
+      a.delete(item)
+    end
   }
   for move in moves
     md=moveData(move)
     for move2 in movedatas
       if md.function==0xA5 && move2[1].function==0 && md.type==move2[1].type &&
          md.basedamage>=move2[1].basedamage
-		    deleteAll.call(moves,move2[0])
+        deleteAll.call(moves,move2[0])
       elsif md.function==move2[1].function && md.basedamage==0 &&
          md.accuracy>move2[1].accuracy
         # Supersonic vs. Confuse Ray, etc.
         deleteAll.call(moves,move2[0])
       elsif md.function==0x06 && move2[1].function==0x05
-		    deleteAll.call(moves,move2[0])
+        deleteAll.call(moves,move2[0])
       elsif md.function==move2[1].function && md.basedamage!=0 && 
-		     md.type==move2[1].type &&
-		     (md.totalpp==15 || md.totalpp==10 || md.totalpp==move2[1].totalpp) && 
-		     (md.basedamage>move2[1].basedamage ||
-		     (md.basedamage==move2[1].basedamage && md.accuracy>move2[1].accuracy))
-		    # Surf, Flamethrower, Thunderbolt, etc.
-		    deleteAll.call(moves,move2[0])
-		  end
-	  end
+         md.type==move2[1].type &&
+         (md.totalpp==15 || md.totalpp==10 || md.totalpp==move2[1].totalpp) && 
+         (md.basedamage>move2[1].basedamage ||
+         (md.basedamage==move2[1].basedamage && md.accuracy>move2[1].accuracy))
+        # Surf, Flamethrower, Thunderbolt, etc.
+        deleteAll.call(moves,move2[0])
+      end
+    end
   end
   return moves
 end
@@ -920,13 +920,12 @@ def pbDecideWinnerEffectiveness(move,otype1,otype2,ability,scores)
   return 0 if data.basedamage==0
   atype=data.type
   typemod=4
-  if isConst?(ability,PBAbilities,:LEVITATE) && 
-     isConst?(data.type,PBTypes,:GROUND)
+  if isConst?(ability,PBAbilities,:LEVITATE) && isConst?(data.type,PBTypes,:GROUND)
     typemod=4
   else
     mod1=PBTypes.getEffectiveness(atype,otype1)
     mod2=(otype1==otype2) ? 2 : PBTypes.getEffectiveness(atype,otype2)
-    if(isConst?(ability,PBAbilities,:WONDERGUARD))
+    if isConst?(ability,PBAbilities,:WONDERGUARD)
       mod1=2 if mod1!=4
       mod2=2 if mod2!=4
     end
@@ -968,16 +967,16 @@ def pbDecideWinnerScore(party0,party1,rating)
 end
 
 def pbDecideWinner(party0,party1,rating0,rating1)
-	rating0=(rating0*15.0/100).round 
-	rating1=(rating1*15.0/100).round
-	score0=pbDecideWinnerScore(party0,party1,rating0)
-	score1=pbDecideWinnerScore(party1,party0,rating1)
-	if score0==score1
-		return 5 if rating0==rating1
-		return (rating0>rating1) ? 1 : 2
-	else
-		return (score0>score1) ? 1 : 2
-	end
+  rating0=(rating0*15.0/100).round 
+  rating1=(rating1*15.0/100).round
+  score0=pbDecideWinnerScore(party0,party1,rating0)
+  score1=pbDecideWinnerScore(party1,party0,rating1)
+  if score0==score1
+    return 5 if rating0==rating1
+    return (rating0>rating1) ? 1 : 2
+  else
+    return (score0>score1) ? 1 : 2
+  end
 end
 
 def pbRuledBattle(team1,team2,rule)
@@ -1073,7 +1072,7 @@ def pbTrainerInfo(pokemonlist,trfile,rules)
       gender=(!trainertypes[trainerid] ||
               !trainertypes[trainerid][7]) ? 2 : trainertypes[trainerid][7]
       randomName=getRandomNameEx(gender,nil,0,12)
-	    tr=[trainerid,randomName,_INTL("Here I come!"),
+      tr=[trainerid,randomName,_INTL("Here I come!"),
           _INTL("Yes, I won!"),_INTL("Man, I lost!"),[]]
       bttrainers.push(tr)
     end
@@ -1178,11 +1177,11 @@ def pbTrainerInfo(pokemonlist,trfile,rules)
           end
           break if numbers.length>=6 && rules.ruleset.hasValidTeam?(numbersPokemon)
         end
-	      if numbers.length<6 || !rules.ruleset.hasValidTeam?(numbersPokemon)
+        if numbers.length<6 || !rules.ruleset.hasValidTeam?(numbersPokemon)
           while numbers.length<pokemonlist.length &&
              (numbers.length<6 || !rules.ruleset.hasValidTeam?(numbersPokemon))
             index=rand(pokemonlist.length)
-	          if !numbers.include?(index)
+            if !numbers.include?(index)
               numbers.push(index)
               numbersPokemon.push(pokemonlist[index])
             end

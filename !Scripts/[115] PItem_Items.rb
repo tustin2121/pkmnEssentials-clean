@@ -580,6 +580,8 @@ def pbConsumeItemInBattle(bag,item)
   end
 end
 
+# Only called when in the party screen and having chosen an item to be used on
+# the selected Pokémon
 def pbUseItemOnPokemon(item,pokemon,scene)
   if $ItemData[item][ITEMUSE]==3 || $ItemData[item][ITEMUSE]==4    # TM or HM
     machine=$ItemData[item][ITEMMACHINE]
@@ -608,6 +610,8 @@ def pbUseItemOnPokemon(item,pokemon,scene)
     return false
   else
     ret=ItemHandlers.triggerUseOnPokemon(item,pokemon,scene)
+    scene.pbClearAnnotations
+    scene.pbHardRefresh
     if ret && $ItemData[item][ITEMUSE]==1 # Usable on Pokémon, consumed
       $PokemonBag.pbDeleteItem(item)
     end
@@ -714,7 +718,7 @@ def pbUseItem(bag,item,bagscene=nil)
   end
 end
 
-def Kernel.pbChooseItem(var=0)
+def Kernel.pbChooseItem(var=0,*args)
   ret=0
   scene=PokemonBag_Scene.new
   screen=PokemonBagScreen.new(scene,$PokemonBag)

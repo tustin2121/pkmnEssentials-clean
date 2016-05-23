@@ -186,7 +186,7 @@ class PBPokemon
 
   def convertMove(move)
     if isConst?(move,PBMoves,:RETURN) && hasConst?(PBMoves,:FRUSTRATION)
-       move=getConst(PBMoves,:FRUSTRATION)
+      move=getConst(PBMoves,:FRUSTRATION)
     end
     return move
   end
@@ -899,8 +899,8 @@ def pbBattleFactoryPokemon(rule,numwins,numswaps,rentals)
       if (table[i*4+1]<0 || table[i*4+1]>=numwins)
         pokemonNumbers=[
            table[i*4+2]*btpokemon.length/882,
-	         table[i*4+3]*btpokemon.length/882
-	      ]
+           table[i*4+3]*btpokemon.length/882
+        ]
       end
     end
   end

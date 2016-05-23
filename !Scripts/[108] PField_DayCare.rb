@@ -207,7 +207,7 @@ def pbDayCareGenerateEgg
     if k[0]<=EGGINITIALLEVEL
       moves.push(k[1])
     else
-      othermoves.push(k[1]) if mother.knowsMove?(k[1]) && father.knowsMove?(k[1])
+      othermoves.push(k[1]) if mother.hasMove?(k[1]) && father.hasMove?(k[1])
     end
   end
   # Inheriting Natural Moves
@@ -221,7 +221,7 @@ def pbDayCareGenerateEgg
       atk=$ItemData[i][ITEMMACHINE]
       next if !atk || atk==0
       if egg.isCompatibleWithMove?(atk)
-        moves.push(atk) if movefather.knowsMove?(atk)
+        moves.push(atk) if movefather.hasMove?(atk)
       end
     end
   end
@@ -235,7 +235,7 @@ def pbDayCareGenerateEgg
          f.pos=offset
          i=0; loop do break unless i<length
            atk=f.fgetw
-           moves.push(atk) if movefather.knowsMove?(atk)
+           moves.push(atk) if movefather.hasMove?(atk)
            i+=1
          end
        end
@@ -250,7 +250,7 @@ def pbDayCareGenerateEgg
          f.pos=offset
          i=0; loop do break unless i<length
            atk=f.fgetw
-           moves.push(atk) if movemother.knowsMove?(atk)
+           moves.push(atk) if movemother.hasMove?(atk)
            i+=1
          end
        end

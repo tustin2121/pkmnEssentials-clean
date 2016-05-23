@@ -410,6 +410,7 @@ class PokeBattle_Battler
     end
     @effects[PBEffects::Imprison]         = false
     @effects[PBEffects::KingsShield]      = false
+    @effects[PBEffects::LifeOrb]          = false
     @effects[PBEffects::MagicCoat]        = false
     @effects[PBEffects::MeanLook]         = -1
     for i in 0...4
@@ -454,6 +455,7 @@ class PokeBattle_Battler
     @effects[PBEffects::Roar]             = false
     @effects[PBEffects::Rollout]          = 0
     @effects[PBEffects::Roost]            = false
+    @effects[PBEffects::SkipTurn]         = false
     @effects[PBEffects::SkyDrop]          = false
     @effects[PBEffects::SmackDown]        = false
     @effects[PBEffects::Snatch]           = false
@@ -584,6 +586,17 @@ class PokeBattle_Battler
     return false if !id || id==0
     for i in @moves
       return true if i.id==id
+    end
+    return false
+  end
+
+  def pbHasMoveType?(type)
+    if type.is_a?(String) || type.is_a?(Symbol)
+      type=getID(PBTypes,type)
+    end
+    return false if !type || type<0
+    for i in @moves
+      return true if i.type==type
     end
     return false
   end
@@ -1109,8 +1122,8 @@ class PokeBattle_Battler
         next if foe.isFainted?
         for j in foe.moves
           movedata=PBMoveData.new(j.id)
-          eff=PBTypes.getCombinedEffectiveness(movedata.type,type1,type2)
-          if (movedata.basedamage>0 && eff>4) ||
+          eff=PBTypes.getCombinedEffectiveness(movedata.type,type1,type2,@effects[PBEffects::Type3])
+          if (movedata.basedamage>0 && eff>8) ||
              (movedata.function==0x70 && eff>0) # OHKO
             found=true
             break
@@ -1491,7 +1504,7 @@ class PokeBattle_Battler
         end
       end
       # Life Orb
-      if user.hasWorkingItem(:LIFEORB) && !user.hasWorkingAbility(:MAGICGUARD)
+      if user.effects[PBEffects::LifeOrb] && !user.hasWorkingAbility(:MAGICGUARD)
         PBDebug.log("[Item triggered] #{user.pbThis}'s Life Orb (recoil)")
         hploss=user.pbReduceHP((user.totalhp/10).floor,true)
         if hploss>0
@@ -2084,7 +2097,7 @@ class PokeBattle_Battler
     if targets.length==1 && isConst?(thismove.pbType(thismove.type,user,target),PBTypes,:ELECTRIC) && 
        !target.hasWorkingAbility(:LIGHTNINGROD)
       for i in priority # use Pokémon earliest in priority
-        next if target.index==i.index
+        next if user.index==i.index || target.index==i.index
         if i.hasWorkingAbility(:LIGHTNINGROD)
           PBDebug.log("[Ability triggered] #{i.pbThis}'s Lightningrod (change target)")
           target=i # X's Lightningrod took the attack!
@@ -2097,7 +2110,7 @@ class PokeBattle_Battler
     if targets.length==1 && isConst?(thismove.pbType(thismove.type,user,target),PBTypes,:WATER) && 
        !target.hasWorkingAbility(:STORMDRAIN)
       for i in priority # use Pokémon earliest in priority
-        next if target.index==i.index
+        next if user.index==i.index || target.index==i.index
         if i.hasWorkingAbility(:STORMDRAIN)
           PBDebug.log("[Ability triggered] #{i.pbThis}'s Storm Drain (change target)")
           target=i # X's Storm Drain took the attack!
@@ -2111,7 +2124,7 @@ class PokeBattle_Battler
     if PBTargets.targetsOneOpponent?(thismove)
       newtarget=nil; strength=100
       for i in priority # use Pokémon latest in priority
-        next if !pbIsOpposing?(i.index)
+        next if !user.pbIsOpposing?(i.index)
         if !i.isFainted? && !@battle.switching && !i.effects[PBEffects::SkyDrop] &&
            i.effects[PBEffects::FollowMe]>0 && i.effects[PBEffects::FollowMe]<strength
           PBDebug.log("[Lingering effect triggered] #{i.pbThis}'s Follow Me")
@@ -2122,9 +2135,9 @@ class PokeBattle_Battler
       target=newtarget if newtarget
     end
     # TODO: Pressure here is incorrect if Magic Coat redirects target
-    if user.index!=target.index && target.hasWorkingAbility(:PRESSURE)
+    if user.pbIsOpposing?(target.index) && target.hasWorkingAbility(:PRESSURE)
       PBDebug.log("[Ability triggered] #{target.pbThis}'s Pressure (in pbChangeTarget)")
-      pbReducePP(thismove) # Reduce PP
+      user.pbReducePP(thismove) # Reduce PP
     end  
     # Change user to user of Snatch
     if thismove.canSnatch?
@@ -2137,7 +2150,7 @@ class PokeBattle_Battler
           user=i
           # Snatch's PP is reduced if old user has Pressure
           userchoice=@battle.choices[user.index][1]
-          if target.hasWorkingAbility(:PRESSURE) && userchoice>=0
+          if target.hasWorkingAbility(:PRESSURE) && user.pbIsOpposing?(target.index) && userchoice>=0
             PBDebug.log("[Ability triggered] #{target.pbThis}'s Pressure (part of Snatch)")
             pressuremove=user.moves[userchoice]
             pbSetPP(pressuremove,pressuremove.pp-1) if pressuremove.pp>0
@@ -2200,7 +2213,6 @@ class PokeBattle_Battler
   end
 
   def pbReducePP(move)
-    #TODO: Pressure
     if @effects[PBEffects::TwoTurnAttack]>0 ||
        @effects[PBEffects::Bide]>0 || 
        @effects[PBEffects::Outrage]>0 ||
@@ -2299,7 +2311,7 @@ class PokeBattle_Battler
     end
   end
 
-  def pbSuccessCheck(thismove,user,target,accuracy=true)
+  def pbSuccessCheck(thismove,user,target,turneffects,accuracy=true)
     if user.effects[PBEffects::TwoTurnAttack]>0
       return true
     end
@@ -2375,8 +2387,9 @@ class PokeBattle_Battler
       @battle.pbDisplay(_INTL("{1} protected itself!",target.pbThis))
       @battle.successStates[user.index].protected=true
       PBDebug.log("[Move failed] #{user.pbThis}'s Spiky Shield stopped the attack")
-      if thismove.isContactMove?
-        amt=target.pbReduceHP((target.totalhp/8).floor) if !target.isFainted?
+      if thismove.isContactMove? && !user.isFainted?
+        @battle.scene.pbDamageAnimation(user,0)
+        amt=user.pbReduceHP((user.totalhp/8).floor)
         @battle.pbDisplay(_INTL("{1} was hurt!",user.pbThis)) if amt>0
       end
       return false
@@ -2469,6 +2482,7 @@ class PokeBattle_Battler
                          thismove.function==0x15 ||  # Hurricane
                          thismove.function==0x77 ||  # Gust
                          thismove.function==0x78 ||  # Twister
+                         thismove.function==0xCE ||  # Sky Drop
                          thismove.function==0x11B || # Sky Uppercut
                          thismove.function==0x11C    # Smack Down
       end
@@ -2477,6 +2491,7 @@ class PokeBattle_Battler
                     @battle.futuresight
       override=true if USENEWBATTLEMECHANICS && thismove.function==0x06 && # Toxic
                     thismove.basedamage==0 && user.pbHasType?(:POISON)
+      override=true if !miss && turneffects[PBEffects::SkipAccuracyCheck] # Called by another move
       if !override && (miss || !thismove.pbAccuracyCheck(user,target)) # Includes Counter/Mirror Coat
         PBDebug.log(sprintf("[Move failed] Failed pbAccuracyCheck (function code %02X) or target is semi-invulnerable",thismove.function))
         if thismove.target==PBTargets::AllOpposing && 
@@ -2501,7 +2516,9 @@ class PokeBattle_Battler
   def pbTryUseMove(choice,thismove,turneffects)
     return true if turneffects[PBEffects::PassedTrying]
     # TODO: Return true if attack has been Mirror Coated once already
-    return false if !pbObedienceCheck?(choice)
+    if !turneffects[PBEffects::SkipAccuracyCheck]
+      return false if !pbObedienceCheck?(choice)
+    end
     if @effects[PBEffects::SkyDrop] # Intentionally no message here
       PBDebug.log("[Move failed] #{pbThis} can't use #{thismove.name} because of being Sky Dropped")
       return false
@@ -2568,16 +2585,18 @@ class PokeBattle_Battler
       PBDebug.log("[Ability triggered] #{pbThis}'s Truant")
       return false
     end
-    if self.status==PBStatuses::SLEEP
-      self.statusCount-=1
-      if self.statusCount<=0
-        self.pbCureStatus
-      else
-        self.pbContinueStatus
-        PBDebug.log("[Status] #{pbThis} remained asleep (count: #{self.statusCount})")
-        if !thismove.pbCanUseWhileAsleep? # Snore/Sleep Talk/Outrage
-          PBDebug.log("[Move failed] #{pbThis} couldn't use #{thismove.name} while asleep")
-          return false
+    if !turneffects[PBEffects::SkipAccuracyCheck]
+      if self.status==PBStatuses::SLEEP
+        self.statusCount-=1
+        if self.statusCount<=0
+          self.pbCureStatus
+        else
+          self.pbContinueStatus
+          PBDebug.log("[Status] #{pbThis} remained asleep (count: #{self.statusCount})")
+          if !thismove.pbCanUseWhileAsleep? # Snore/Sleep Talk/Outrage
+            PBDebug.log("[Move failed] #{pbThis} couldn't use #{thismove.name} while asleep")
+            return false
+          end
         end
       end
     end
@@ -2587,7 +2606,7 @@ class PokeBattle_Battler
         self.pbCureStatus(false)
         @battle.pbDisplay(_INTL("{1} melted the ice!",pbThis))
         pbCheckForm
-      elsif @battle.pbRandom(10)<2
+      elsif @battle.pbRandom(10)<2 && !turneffects[PBEffects::SkipAccuracyCheck]
         self.pbCureStatus
         pbCheckForm
       elsif !thismove.canThawUser?
@@ -2596,18 +2615,20 @@ class PokeBattle_Battler
         return false
       end
     end
-    if @effects[PBEffects::Confusion]>0
-      @effects[PBEffects::Confusion]-=1
-      if @effects[PBEffects::Confusion]<=0
-        pbCureConfusion
-      else
-        pbContinueConfusion
-        PBDebug.log("[Status] #{pbThis} remained confused (count: #{@effects[PBEffects::Confusion]})")
-        if @battle.pbRandom(2)==0
-          pbConfusionDamage
-          @battle.pbDisplay(_INTL("It hurt itself in its confusion!")) 
-          PBDebug.log("[Status] #{pbThis} hurt itself in its confusion and couldn't move")
-          return false
+    if !turneffects[PBEffects::SkipAccuracyCheck]
+      if @effects[PBEffects::Confusion]>0
+        @effects[PBEffects::Confusion]-=1
+        if @effects[PBEffects::Confusion]<=0
+          pbCureConfusion
+        else
+          pbContinueConfusion
+          PBDebug.log("[Status] #{pbThis} remained confused (count: #{@effects[PBEffects::Confusion]})")
+          if @battle.pbRandom(2)==0
+            pbConfusionDamage
+            @battle.pbDisplay(_INTL("It hurt itself in its confusion!")) 
+            PBDebug.log("[Status] #{pbThis} hurt itself in its confusion and couldn't move")
+            return false
+          end
         end
       end
     end
@@ -2622,19 +2643,21 @@ class PokeBattle_Battler
       end
       return false
     end
-    if @effects[PBEffects::Attract]>=0
-      pbAnnounceAttract(@battle.battlers[@effects[PBEffects::Attract]])
-      if @battle.pbRandom(2)==0
-        pbContinueAttract
-        PBDebug.log("[Lingering effect triggered] #{pbThis} was infatuated and couldn't move")
-        return false
+    if !turneffects[PBEffects::SkipAccuracyCheck]
+      if @effects[PBEffects::Attract]>=0
+        pbAnnounceAttract(@battle.battlers[@effects[PBEffects::Attract]])
+        if @battle.pbRandom(2)==0
+          pbContinueAttract
+          PBDebug.log("[Lingering effect triggered] #{pbThis} was infatuated and couldn't move")
+          return false
+        end
       end
-    end
-    if self.status==PBStatuses::PARALYSIS
-      if @battle.pbRandom(4)==0
-        pbContinueStatus
-        PBDebug.log("[Status] #{pbThis} was fully paralysed and couldn't move")
-        return false
+      if self.status==PBStatuses::PARALYSIS
+        if @battle.pbRandom(4)==0
+          pbContinueStatus
+          PBDebug.log("[Status] #{pbThis} was fully paralysed and couldn't move")
+          return false
+        end
       end
     end
     turneffects[PBEffects::PassedTrying]=true
@@ -2662,7 +2685,7 @@ class PokeBattle_Battler
       target.damagestate.reset
       # Check success (accuracy/evasion calculation)
       if !nocheck &&
-         !pbSuccessCheck(thismove,user,target,i==0 || thismove.successCheckPerHit?)
+         !pbSuccessCheck(thismove,user,target,turneffects,i==0 || thismove.successCheckPerHit?)
         if thismove.function==0xBF && realnumhits>0   # Triple Kick
           break   # Considered a success if Triple Kick hits at least once
         elsif thismove.function==0x10B   # Hi Jump Kick, Jump Kick
@@ -2751,7 +2774,6 @@ class PokeBattle_Battler
       end
       if target.isFainted?
         destinybond=destinybond || target.effects[PBEffects::DestinyBond]
-        target.pbFaint # no return
       end
       user.pbFaint if user.isFainted? # no return
       break if user.isFainted?
@@ -2879,6 +2901,7 @@ class PokeBattle_Battler
     # Note: user.lastMoveUsedType IS to be updated on nested calls; is used for Conversion 2
     turneffects=[]
     turneffects[PBEffects::SpecialUsage]=specialusage
+    turneffects[PBEffects::SkipAccuracyCheck]=specialusage
     turneffects[PBEffects::PassedTrying]=false
     turneffects[PBEffects::TotalDamage]=0
     # Start using the move
@@ -2916,21 +2939,22 @@ class PokeBattle_Battler
         self.form=1
         pbUpdate(true)
         @battle.scene.pbChangePokemon(self,@pokemon)
-        @battle.pbDisplay(_INTL("{1} changed to Blade Forme",pbThis))
+        @battle.pbDisplay(_INTL("{1} changed to Blade Forme!",pbThis))
         PBDebug.log("[Form changed] #{pbThis} changed to Blade Forme")
       elsif isConst?(thismove.id,PBMoves,:KINGSSHIELD) && self.form!=0
         self.form=0
         pbUpdate(true)
         @battle.scene.pbChangePokemon(self,@pokemon)
-        @battle.pbDisplay(_INTL("{1} changed to Shield Forme",pbThis))
+        @battle.pbDisplay(_INTL("{1} changed to Shield Forme!",pbThis))
         PBDebug.log("[Form changed] #{pbThis} changed to Shield Forme")
       end      
     end
+    # Record that user has used a move this round (ot at least tried to)
+    self.lastRoundMoved=@battle.turncount
     # Try to use the move
     if !pbTryUseMove(choice,thismove,turneffects)
       self.lastMoveUsed=-1
       self.lastMoveUsedType=-1
-      self.lastRoundMoved=@battle.turncount
       if !turneffects[PBEffects::SpecialUsage]
         self.lastMoveUsedSketch=-1 if self.effects[PBEffects::TwoTurnAttack]==0
         self.lastRegularMoveUsed=-1
@@ -2949,7 +2973,6 @@ class PokeBattle_Battler
         self.lastMoveUsedType=-1
         self.lastMoveUsedSketch=-1 if self.effects[PBEffects::TwoTurnAttack]==0
         self.lastRegularMoveUsed=-1
-        self.lastRoundMoved=@battle.turncount
         pbEndTurn(choice)
         @battle.pbJudge #        @battle.pbSwitch
         PBDebug.log("[Move failed] #{thismove.name} has no PP left")
@@ -2973,12 +2996,10 @@ class PokeBattle_Battler
     # "X used Y!" message
     case thismove.pbDisplayUseMessage(self)
     when 2   # Continuing Bide
-      self.lastRoundMoved=@battle.turncount
       return
     when 1   # Starting Bide
       self.lastMoveUsed=thismove.id
       self.lastMoveUsedType=thismove.pbType(thismove.type,self,nil)
-      self.lastRoundMoved=@battle.turncount
       if !turneffects[PBEffects::SpecialUsage]
         self.lastMoveUsedSketch=thismove.id if self.effects[PBEffects::TwoTurnAttack]==0
         self.lastRegularMoveUsed=thismove.id
@@ -2991,7 +3012,6 @@ class PokeBattle_Battler
     when -1   # Was hurt while readying Focus Punch, fails use
       self.lastMoveUsed=thismove.id
       self.lastMoveUsedType=thismove.pbType(thismove.type,self,nil)
-      self.lastRoundMoved=@battle.turncount
       if !turneffects[PBEffects::SpecialUsage]
         self.lastMoveUsedSketch=thismove.id if self.effects[PBEffects::TwoTurnAttack]==0
         self.lastRegularMoveUsed=thismove.id
@@ -3010,12 +3030,10 @@ class PokeBattle_Battler
     @battle.successStates[user.index].useState=1
     @battle.successStates[user.index].typemod=8
     # Check whether Selfdestruct works
-    selffaint=(thismove.function==0xE0) # Selfdestruct
     if !thismove.pbOnStartUse(user) # Selfdestruct, Natural Gift, Beat Up can return false here
       PBDebug.log(sprintf("[Move failed] Failed pbOnStartUse (function code %02X)",thismove.function))
       user.lastMoveUsed=thismove.id
       user.lastMoveUsedType=thismove.pbType(thismove.type,user,nil)
-      user.lastRoundMoved=@battle.turncount
       if !turneffects[PBEffects::SpecialUsage]
         user.lastMoveUsedSketch=thismove.id if user.effects[PBEffects::TwoTurnAttack]==0
         user.lastRegularMoveUsed=thismove.id
@@ -3023,10 +3041,6 @@ class PokeBattle_Battler
       @battle.lastMoveUsed=thismove.id
       @battle.lastMoveUser=user.index
       return
-    end
-    if selffaint
-      user.hp=0
-      user.pbFaint # no return
     end
     # Primordial Sea, Desolate Land
     if thismove.pbIsDamaging?
@@ -3037,7 +3051,6 @@ class PokeBattle_Battler
           @battle.pbDisplay(_INTL("The Fire-type attack fizzled out in the heavy rain!"))
           user.lastMoveUsed=thismove.id
           user.lastMoveUsedType=thismove.pbType(thismove.type,user,nil)
-          user.lastRoundMoved=@battle.turncount
           if !turneffects[PBEffects::SpecialUsage]
             user.lastMoveUsedSketch=thismove.id if user.effects[PBEffects::TwoTurnAttack]==0
             user.lastRegularMoveUsed=thismove.id
@@ -3052,7 +3065,6 @@ class PokeBattle_Battler
           @battle.pbDisplay(_INTL("The Water-type attack evaporated in the harsh sunlight!"))
           user.lastMoveUsed=thismove.id
           user.lastMoveUsedType=thismove.pbType(thismove.type,user,nil)
-          user.lastRoundMoved=@battle.turncount
           if !turneffects[PBEffects::SpecialUsage]
             user.lastMoveUsedSketch=thismove.id if user.effects[PBEffects::TwoTurnAttack]==0
             user.lastRegularMoveUsed=thismove.id
@@ -3071,7 +3083,6 @@ class PokeBattle_Battler
       user.pbReduceHP(1+(user.totalhp/4).floor) if !user.hasWorkingAbility(:MAGICGUARD)   
       user.lastMoveUsed=thismove.id
       user.lastMoveUsedType=thismove.pbType(thismove.type,user,nil)
-      user.lastRoundMoved=@battle.turncount
       if !turneffects[PBEffects::SpecialUsage]
         user.lastMoveUsedSketch=thismove.id if user.effects[PBEffects::TwoTurnAttack]==0
         user.lastRegularMoveUsed=thismove.id
@@ -3150,57 +3161,32 @@ class PokeBattle_Battler
         showanimation=false
         i+=1
       end
-      # Pokémon switching caused by Roar, Whirlwind, Circle Throw, Dragon Tail, Red Card
-      if !user.isFainted?
-        switched=[]
-        for i in 0...4
-          if @battle.battlers[i].effects[PBEffects::Roar]
-            @battle.battlers[i].effects[PBEffects::Roar]=false
-            @battle.battlers[i].effects[PBEffects::Uturn]=false
-            next if @battle.battlers[i].isFainted?
-            next if !@battle.pbCanSwitch?(i,-1,false)
-            choices=[]
-            party=@battle.pbParty(i)
-            for j in 0...party.length
-              choices.push(j) if @battle.pbCanSwitchLax?(i,j,false)
-            end
-            if choices.length>0
-              newpoke=choices[@battle.pbRandom(choices.length)]
-              newpokename=newpoke
-              if isConst?(party[newpoke].ability,PBAbilities,:ILLUSION)
-                newpokename=pbGetLastPokeInTeam(i)
-              end
-              switched.push(i)
-              @battle.battlers[i].pbResetForm
-              @battle.pbRecallAndReplace(i,newpoke,newpokename,false,user.hasMoldBreaker)
-              @battle.pbDisplay(_INTL("{1} was dragged out!",@battle.battlers[i].pbThis))
-            end
-          end
-        end
-        for i in @battle.pbPriority
-          next if !switched.include?(i.index)
-          i.pbAbilitiesOnSwitchIn(true)
-        end
-      end
-      # Pokémon switching caused by U-Turn, Volt Switch, Eject Button
+    end
+    # Pokémon switching caused by Roar, Whirlwind, Circle Throw, Dragon Tail, Red Card
+    if !user.isFainted?
       switched=[]
       for i in 0...4
-        if @battle.battlers[i].effects[PBEffects::Uturn]
-          @battle.battlers[i].effects[PBEffects::Uturn]=false
+        if @battle.battlers[i].effects[PBEffects::Roar]
           @battle.battlers[i].effects[PBEffects::Roar]=false
-          if !@battle.battlers[i].isFainted? && @battle.pbCanChooseNonActive?(i) &&
-             !@battle.pbAllFainted?(@battle.pbOpposingParty(i))
-            # TODO: Pursuit should go here, and negate this effect if it KO's attacker
-            @battle.pbDisplay(_INTL("{1} went back to {2}!",@battle.battlers[i].pbThis,@battle.pbGetOwner(i).name))
-            newpoke=0
-            newpoke=@battle.pbSwitchInBetween(i,true,false)
+          @battle.battlers[i].effects[PBEffects::Uturn]=false
+          next if @battle.battlers[i].isFainted?
+          next if !@battle.pbCanSwitch?(i,-1,false)
+          choices=[]
+          party=@battle.pbParty(i)
+          for j in 0...party.length
+            choices.push(j) if @battle.pbCanSwitchLax?(i,j,false)
+          end
+          if choices.length>0
+            newpoke=choices[@battle.pbRandom(choices.length)]
             newpokename=newpoke
-            if isConst?(@battle.pbParty(i)[newpoke].ability,PBAbilities,:ILLUSION)
+            if isConst?(party[newpoke].ability,PBAbilities,:ILLUSION)
               newpokename=pbGetLastPokeInTeam(i)
             end
             switched.push(i)
             @battle.battlers[i].pbResetForm
-            @battle.pbRecallAndReplace(i,newpoke,newpokename,@battle.battlers[i].effects[PBEffects::BatonPass])
+            @battle.pbRecallAndReplace(i,newpoke,newpokename,false,user.hasMoldBreaker)
+            @battle.pbDisplay(_INTL("{1} was dragged out!",@battle.battlers[i].pbThis))
+            @battle.choices[i]=[0,0,nil,-1]   # Replacement Pokémon does nothing this round
           end
         end
       end
@@ -3208,27 +3194,54 @@ class PokeBattle_Battler
         next if !switched.include?(i.index)
         i.pbAbilitiesOnSwitchIn(true)
       end
-      # Baton Pass
-      if user.effects[PBEffects::BatonPass]
-        user.effects[PBEffects::BatonPass]=false
-        if !user.isFainted? && @battle.pbCanChooseNonActive?(user.index) &&
-           !@battle.pbAllFainted?(@battle.pbParty(target.index))
+    end
+    # Pokémon switching caused by U-Turn, Volt Switch, Eject Button
+    switched=[]
+    for i in 0...4
+      if @battle.battlers[i].effects[PBEffects::Uturn]
+        @battle.battlers[i].effects[PBEffects::Uturn]=false
+        @battle.battlers[i].effects[PBEffects::Roar]=false
+        if !@battle.battlers[i].isFainted? && @battle.pbCanChooseNonActive?(i) &&
+           !@battle.pbAllFainted?(@battle.pbOpposingParty(i))
+          # TODO: Pursuit should go here, and negate this effect if it KO's attacker
+          @battle.pbDisplay(_INTL("{1} went back to {2}!",@battle.battlers[i].pbThis,@battle.pbGetOwner(i).name))
           newpoke=0
-          newpoke=@battle.pbSwitchInBetween(user.index,true,false)
+          newpoke=@battle.pbSwitchInBetween(i,true,false)
           newpokename=newpoke
-          if isConst?(@battle.pbParty(user.index)[newpoke].ability,PBAbilities,:ILLUSION)
-            newpokename=pbGetLastPokeInTeam(user.index)
+          if isConst?(@battle.pbParty(i)[newpoke].ability,PBAbilities,:ILLUSION)
+            newpokename=pbGetLastPokeInTeam(i)
           end
-          user.pbResetForm
-          @battle.pbRecallAndReplace(user.index,newpoke,newpokename,true)
-          user.pbAbilitiesOnSwitchIn(true)
+          switched.push(i)
+          @battle.battlers[i].pbResetForm
+          @battle.pbRecallAndReplace(i,newpoke,newpokename,@battle.battlers[i].effects[PBEffects::BatonPass])
+          @battle.choices[i]=[0,0,nil,-1]   # Replacement Pokémon does nothing this round
         end
+      end
+    end
+    for i in @battle.pbPriority
+      next if !switched.include?(i.index)
+      i.pbAbilitiesOnSwitchIn(true)
+    end
+    # Baton Pass
+    if user.effects[PBEffects::BatonPass]
+      user.effects[PBEffects::BatonPass]=false
+      if !user.isFainted? && @battle.pbCanChooseNonActive?(user.index) &&
+         !@battle.pbAllFainted?(@battle.pbParty(user.index))
+        newpoke=0
+        newpoke=@battle.pbSwitchInBetween(user.index,true,false)
+        newpokename=newpoke
+        if isConst?(@battle.pbParty(user.index)[newpoke].ability,PBAbilities,:ILLUSION)
+          newpokename=pbGetLastPokeInTeam(user.index)
+        end
+        user.pbResetForm
+        @battle.pbRecallAndReplace(user.index,newpoke,newpokename,true)
+        @battle.choices[user.index]=[0,0,nil,-1]   # Replacement Pokémon does nothing this round
+        user.pbAbilitiesOnSwitchIn(true)
       end
     end
     # Record move as having been used
     user.lastMoveUsed=thismove.id
     user.lastMoveUsedType=thismove.pbType(thismove.type,user,nil)
-    user.lastRoundMoved=@battle.turncount
     if !turneffects[PBEffects::SpecialUsage]
       user.lastMoveUsedSketch=thismove.id if user.effects[PBEffects::TwoTurnAttack]==0
       user.lastRegularMoveUsed=thismove.id

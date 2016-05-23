@@ -348,7 +348,7 @@ class PokeBattle_DebugScene
     return -1
   end
 
-  def pbFirstTarget(index)
+  def pbFirstTarget(index,targettype)
     for i in 0...4
       if i!=index && !@battle.battlers[i].isFainted?
         return i
@@ -380,8 +380,8 @@ class PokeBattle_DebugScene
 
 # Use this method to make the player choose a target 
 # for certain moves in double battles.
-  def pbChooseTarget(index)
-    curwindow=pbFirstTarget(index)
+  def pbChooseTarget(index,targettype)
+    curwindow=pbFirstTarget(index,targettype)
     if curwindow==-1
       raise RuntimeError.new("No targets somehow...")
     end
@@ -586,7 +586,7 @@ class PokeBattle_SceneNonInteractive < PokeBattle_Scene
     return -1
   end
 
-  def pbChooseTarget(index)
+  def pbChooseTarget(index,targettype)
     targets=[]
     for i in 0...4
       if @battle.battlers[index].pbIsOpposing?(i) &&
@@ -698,7 +698,7 @@ class PokeBattle_DebugSceneNoLogging
     return -1
   end
 
-  def pbChooseTarget(index)
+  def pbChooseTarget(index,targettype)
     targets=[]
     for i in 0...4
       if @battle.battlers[index].pbIsOpposing?(i) &&
@@ -879,7 +879,7 @@ class PokeBattle_DebugSceneNoGraphics
     return -1
   end
 
-  def pbChooseTarget(index)
+  def pbChooseTarget(index,targettype)
     targets=[]
     for i in 0...4
       if @battle.battlers[index].pbIsOpposing?(i) &&

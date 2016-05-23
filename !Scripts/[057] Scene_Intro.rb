@@ -75,8 +75,8 @@ class IntroEventScene < EventScene
     onCTrigger.clear
     onUpdate.clear
     # Play random cry
-    cry=pbResolveAudioSE(pbCryFile(1+rand(PBSpecies.maxValue)))
-    pbSEPlay(cry,100,100) if cry
+    cry=pbCryFile(1+rand(PBSpecies.maxValue))
+    pbSEPlay(cry,80,100) if cry
     # Fade out
     @pic.moveOpacity(15,0,0)
     @pic2.moveOpacity(15,0,0)
@@ -92,8 +92,8 @@ class IntroEventScene < EventScene
     onCTrigger.clear
     onUpdate.clear
     # Play random cry
-    cry=pbResolveAudioSE(pbCryFile(1+rand(PBSpecies.maxValue)))
-    pbSEPlay(cry,100,100) if cry
+    cry=pbCryFile(1+rand(PBSpecies.maxValue))
+    pbSEPlay(cry,80,100) if cry
     # Fade out
     @pic.moveOpacity(15,0,0)
     @pic2.moveOpacity(15,0,0)

@@ -99,7 +99,8 @@ class PokeBattle_Trainer
   end
 
   def hasSkillCode(code)
-    return true if skillCode[/#{code}/]
+    c=skillCode
+    return true if c!=nil && c!="" && c[/#{code}/]
     return false
   end
 
@@ -115,7 +116,7 @@ class PokeBattle_Trainer
     ret=2   # 2 = gender unknown
     pbRgssOpen("Data/trainertypes.dat","rb"){|f|
        trainertypes=Marshal.load(f)
-       if !trainertypes[trainertype]
+       if !trainertypes || !trainertypes[trainertype]
          ret=2
        else
          ret=trainertypes[trainertype][7]

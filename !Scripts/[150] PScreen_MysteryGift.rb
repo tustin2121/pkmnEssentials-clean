@@ -50,9 +50,9 @@ def pbEditMysteryGift(type,item,id=0,giftname="")
             item.obtainText=obtainname
             break
           end
-          return nil if Kernel.pbConfirmMessage(_INTL("Stop editng this gift?"))
+          return nil if Kernel.pbConfirmMessage(_INTL("Stop editing this gift?"))
         elsif command==-1
-          return nil if Kernel.pbConfirmMessage(_INTL("Stop editng this gift?"))
+          return nil if Kernel.pbConfirmMessage(_INTL("Stop editing this gift?"))
         end
       end
     elsif type>0   # Item
@@ -63,7 +63,7 @@ def pbEditMysteryGift(type,item,id=0,giftname="")
       loop do
         newtype=Kernel.pbMessageChooseNumber(_INTL("Choose a quantity."),params)
         if newtype==0
-          return nil if Kernel.pbConfirmMessage(_INTL("Stop editng this gift?"))
+          return nil if Kernel.pbConfirmMessage(_INTL("Stop editing this gift?"))
         else
           type=newtype
           break
@@ -84,7 +84,7 @@ def pbEditMysteryGift(type,item,id=0,giftname="")
       loop do
         newid=Kernel.pbMessageChooseNumber(_INTL("Choose a unique ID for this gift."),params)
         if newid==0
-          return nil if Kernel.pbConfirmMessage(_INTL("Stop editng this gift?"))
+          return nil if Kernel.pbConfirmMessage(_INTL("Stop editing this gift?"))
         else
           if idlist.include?(newid)
             Kernel.pbMessage(_INTL("That ID is already used by a Mystery Gift."))
@@ -101,7 +101,7 @@ def pbEditMysteryGift(type,item,id=0,giftname="")
         giftname=newgiftname
         break
       end
-      return nil if Kernel.pbConfirmMessage(_INTL("Stop editng this gift?"))
+      return nil if Kernel.pbConfirmMessage(_INTL("Stop editing this gift?"))
     end
     return [id,type,item,giftname]
   rescue

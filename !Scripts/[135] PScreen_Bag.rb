@@ -234,7 +234,7 @@ class PokemonBag_Scene
   end
 
 # Called when the item screen wants an item to be chosen from the screen
-  def pbChooseItem
+  def pbChooseItem(lockpocket=false)
     pbRefresh
     @sprites["helpwindow"].visible=false
     itemwindow=@sprites["itemwindow"]
@@ -264,19 +264,21 @@ class PokemonBag_Scene
            # Update selected item for current pocket
            @bag.setChoice(itemwindow.pocket,itemwindow.index)
          end
-         # Change pockets if Left/Right pressed
-         numpockets=PokemonBag.numPockets
-         if Input.trigger?(Input::LEFT)
-           if !sorting
-             itemwindow.pocket=(itemwindow.pocket==1) ? numpockets : itemwindow.pocket-1
-             @bag.lastpocket=itemwindow.pocket
-             pbRefresh
-           end
-         elsif Input.trigger?(Input::RIGHT)
-           if !sorting
-             itemwindow.pocket=(itemwindow.pocket==numpockets) ? 1 : itemwindow.pocket+1
-             @bag.lastpocket=itemwindow.pocket
-             pbRefresh
+         if !lockpocket
+           # Change pockets if Left/Right pressed
+           numpockets=PokemonBag.numPockets
+           if Input.trigger?(Input::LEFT)
+             if !sorting
+               itemwindow.pocket=(itemwindow.pocket==1) ? numpockets : itemwindow.pocket-1
+               @bag.lastpocket=itemwindow.pocket
+               pbRefresh
+             end
+           elsif Input.trigger?(Input::RIGHT)
+             if !sorting
+               itemwindow.pocket=(itemwindow.pocket==numpockets) ? 1 : itemwindow.pocket+1
+               @bag.lastpocket=itemwindow.pocket
+               pbRefresh
+             end
            end
          end
          # Select item for switching if A is pressed
@@ -398,7 +400,7 @@ class PokemonBagScreen
     @scene.pbStartScene(@bag)
     item=0
     loop do
-      item=@scene.pbChooseItem
+      item=@scene.pbChooseItem(true)
       break if item==0
       itemname=PBItems.getName(item)
       if !pbIsBerry?(item)
@@ -544,12 +546,12 @@ class PokemonBagScreen
     loop do
       item=@scene.pbChooseItem
       break if item==0
-      cmdUse=-1
-      cmdRegister=-1
-      cmdGive=-1
-      cmdToss=-1
-      cmdRead=-1
-      cmdMysteryGift=-1
+      cmdUse         = -1
+      cmdRegister    = -1
+      cmdGive        = -1
+      cmdToss        = -1
+      cmdRead        = -1
+      cmdMysteryGift = -1
       commands=[]
       # Generate command list
       commands[cmdRead=commands.length]=_INTL("Read") if pbIsMail?(item)

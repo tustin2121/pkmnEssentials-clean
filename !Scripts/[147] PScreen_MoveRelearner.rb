@@ -13,14 +13,14 @@ def pbGetRelearnableMoves(pokemon)
   return [] if !pokemon || pokemon.isEgg? || (pokemon.isShadow? rescue false)
   moves=[]
   pbEachNaturalMove(pokemon){|move,level|
-     if level<=pokemon.level && !pokemon.knowsMove?(move)
+     if level<=pokemon.level && !pokemon.hasMove?(move)
        moves.push(move) if !moves.include?(move)
      end
   }
   tmoves=[]
   if pokemon.firstmoves
     for i in pokemon.firstmoves
-      tmoves.push(i) if !pokemon.knowsMove?(i) && !moves.include?(i)
+      tmoves.push(i) if !pokemon.hasMove?(i) && !moves.include?(i)
     end
   end
   moves=tmoves+moves

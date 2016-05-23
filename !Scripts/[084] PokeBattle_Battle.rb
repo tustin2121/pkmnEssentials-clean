@@ -5,84 +5,6 @@
 #    3 - Player or wild Pokémon ran from battle, or player forfeited the match
 #    4 - Wild Pokémon was caught
 #    5 - Draw
-################################################################################
-# Placeholder battle peer.
-################################################################################
-class PokeBattle_NullBattlePeer
-  def pbStorePokemon(player,pokemon)
-    if player.party.length<6
-      player.party[player.party.length]=pokemon
-    end
-    return -1
-  end
-
-  def pbOnEnteringBattle(battle,pokemon)
-  end
-
-  def pbGetStorageCreator()
-    return nil
-  end
-
-  def pbCurrentBox()
-    return -1
-  end
-
-  def pbBoxName(box)
-    return ""
-  end
-end
-
-
-
-class PokeBattle_BattlePeer
-  def self.create
-    return PokeBattle_NullBattlePeer.new()
-  end
-end
-
-
-
-################################################################################
-# Success state (used for Battle Arena).
-################################################################################
-class PokeBattle_SuccessState
-  attr_accessor :typemod
-  attr_accessor :useState    # 0 - not used, 1 - failed, 2 - succeeded
-  attr_accessor :protected
-  attr_accessor :skill
-
-  def initialize
-    clear
-  end
-
-  def clear
-    @typemod   = 4
-    @useState  = 0
-    @protected = false
-    @skill     = 0
-  end
-
-  def updateSkill
-    if @useState==1 && !@protected
-      @skill-=2
-    elsif @useState==2
-      if @typemod>4
-        @skill+=2 # "Super effective"
-      elsif @typemod>=1 && @typemod<4
-        @skill-=1 # "Not very effective"
-      elsif @typemod==0
-        @skill-=2 # Ineffective
-      else
-        @skill+=1
-      end
-    end
-    @typemod=4
-    @useState=0
-    @protected=false
-  end
-end
-
-
 
 ################################################################################
 # Catching and storing Pokémon.
@@ -298,6 +220,7 @@ class PokeBattle_Battle
   include PokeBattle_BattleCommon
   
   MAXPARTYSIZE = 6
+  MEGARINGS=[:MEGARING,:MEGABRACELET,:MEGACUFF,:MEGACHARM]
 
   class BattleAbortedException < Exception; end
 
@@ -649,8 +572,7 @@ class PokeBattle_Battle
 
   def pbGetMegaRingName(battlerIndex)
     if pbBelongsToPlayer?(battlerIndex)
-      rings=[:MEGARING,:MEGABRACELET,:MEGACUFF,:MEGACHARM]
-      for i in rings
+      for i in MEGARINGS
         next if !hasConst?(PBItems,i)
         return PBItems.getName(getConst(PBItems,i)) if $PokemonBag.pbQuantity(i)>0
       end
@@ -664,8 +586,7 @@ class PokeBattle_Battle
 
   def pbHasMegaRing(battlerIndex)
     return true if !pbBelongsToPlayer?(battlerIndex)
-    rings=[:MEGARING,:MEGABRACELET,:MEGACUFF,:MEGACHARM]
-    for i in rings
+    for i in MEGARINGS
       next if !hasConst?(PBItems,i)
       return true if $PokemonBag.pbQuantity(i)>0
     end
@@ -1054,10 +975,10 @@ class PokeBattle_Battle
         thismove=thispkmn.moves[thispkmn.effects[PBEffects::EncoreIndex]]
         target=thispkmn.pbTarget(thismove)
         if target==PBTargets::SingleNonUser
-          target=@scene.pbChooseTarget(idxPokemon)
+          target=@scene.pbChooseTarget(idxPokemon,target)
           pbRegisterTarget(idxPokemon,target) if target>=0
         elsif target==PBTargets::UserOrPartner
-          target=@scene.pbChooseTarget(idxPokemon)
+          target=@scene.pbChooseTarget(idxPokemon,target)
           pbRegisterTarget(idxPokemon,target) if target>=0 && (target&1)==(idxPokemon&1)
         end
       end
@@ -1573,18 +1494,30 @@ class PokeBattle_Battle
   end
 
   def pbRegisterItem(idxPokemon,idxItem,idxTarget=nil)
-    if idxTarget!=nil && idxTarget>=0 && @battlers[idxTarget].effects[PBEffects::Embargo]>0
-      pbDisplay(_INTL("Embargo's effect prevents the item's use on {1}!",@battlers[idxTarget].pbThis(true)))
-      return false
+    if idxTarget!=nil && idxTarget>=0
+      for i in 0...4
+        if !@battlers[i].pbIsOpposing?(idxPokemon) &&
+           @battlers[i].pokemonIndex==idxTarget &&
+           @battlers[i].effects[PBEffects::Embargo]>0
+          pbDisplay(_INTL("Embargo's effect prevents the item's use on {1}!",@battlers[i].pbThis(true)))
+          if pbBelongsToPlayer?(@battlers[i].index)
+            if $PokemonBag.pbCanStore?(idxItem)
+              $PokemonBag.pbStoreItem(idxItem)
+            else
+              raise _INTL("Couldn't return unused item to Bag somehow.")
+            end
+          end
+          return false
+        end
+      end
     end
     if ItemHandlers.hasUseInBattle(idxItem)
       if idxPokemon==0 # Player's first Pokémon
         if ItemHandlers.triggerBattleUseOnBattler(idxItem,@battlers[idxPokemon],self)
+          # Using Poké Balls or Poké Doll only
           ItemHandlers.triggerUseInBattle(idxItem,@battlers[idxPokemon],self)
           if @doublebattle
-            @choices[idxPokemon+2][0]=3         # "Use an item"
-            @choices[idxPokemon+2][1]=idxItem   # ID of item to be used
-            @choices[idxPokemon+2][2]=idxTarget # Index of Pokémon to use item on
+            @battlers[idxPokemon+2].effects[PBEffects::SkipTurn]=true
           end
         else
           if $PokemonBag.pbCanStore?(idxItem)
@@ -1956,6 +1889,54 @@ class PokeBattle_Battle
     level=defeated.level
     baseexp=defeated.pokemon.baseExp
     evyield=defeated.pokemon.evYield
+    # Gain effort value points, using RS effort values
+    totalev=0
+    for k in 0...6
+      totalev+=thispoke.ev[k]
+    end
+    for k in 0...6
+      evgain=evyield[k]
+      evgain*=2 if isConst?(thispoke.item,PBItems,:MACHOBRACE) ||
+                   isConst?(thispoke.itemInitial,PBItems,:MACHOBRACE)
+      case k
+      when PBStats::HP
+        evgain+=4 if isConst?(thispoke.item,PBItems,:POWERWEIGHT) ||
+                     isConst?(thispoke.itemInitial,PBItems,:POWERWEIGHT)
+      when PBStats::ATTACK
+        evgain+=4 if isConst?(thispoke.item,PBItems,:POWERBRACER) ||
+                     isConst?(thispoke.itemInitial,PBItems,:POWERBRACER)
+      when PBStats::DEFENSE
+        evgain+=4 if isConst?(thispoke.item,PBItems,:POWERBELT) ||
+                     isConst?(thispoke.itemInitial,PBItems,:POWERBELT)
+      when PBStats::SPATK
+        evgain+=4 if isConst?(thispoke.item,PBItems,:POWERLENS) ||
+                     isConst?(thispoke.itemInitial,PBItems,:POWERLENS)
+      when PBStats::SPDEF
+        evgain+=4 if isConst?(thispoke.item,PBItems,:POWERBAND) ||
+                     isConst?(thispoke.itemInitial,PBItems,:POWERBAND)
+      when PBStats::SPEED
+        evgain+=4 if isConst?(thispoke.item,PBItems,:POWERANKLET) ||
+                     isConst?(thispoke.itemInitial,PBItems,:POWERANKLET)
+      end
+      evgain*=2 if thispoke.pokerusStage>=1 # Infected or cured
+      if evgain>0
+        # Can't exceed overall limit
+        evgain-=totalev+evgain-PokeBattle_Pokemon::EVLIMIT if totalev+evgain>PokeBattle_Pokemon::EVLIMIT
+        # Can't exceed stat limit
+        evgain-=thispoke.ev[k]+evgain-PokeBattle_Pokemon::EVSTATLIMIT if thispoke.ev[k]+evgain>PokeBattle_Pokemon::EVSTATLIMIT
+        # Add EV gain
+        thispoke.ev[k]+=evgain
+        if thispoke.ev[k]>PokeBattle_Pokemon::EVSTATLIMIT
+          print "Single-stat EV limit #{PokeBattle_Pokemon::EVSTATLIMIT} exceeded.\r\nStat: #{k}  EV gain: #{evgain}  EVs: #{thispoke.ev.inspect}"
+          thispoke.ev[k]=PokeBattle_Pokemon::EVSTATLIMIT
+        end
+        totalev+=evgain
+        if totalev>PokeBattle_Pokemon::EVLIMIT
+          print "EV limit #{PokeBattle_Pokemon::EVLIMIT} exceeded.\r\nTotal EVs: #{totalev} EV gain: #{evgain}  EVs: #{thispoke.ev.inspect}"
+        end
+      end
+    end
+    # Gain experience
     ispartic=0
     ispartic=1 if defeated.participants.include?(index)
     haveexpshare=(isConst?(thispoke.item,PBItems,:EXPSHARE) ||
@@ -2011,53 +1992,6 @@ class PokeBattle_Battle
           pbDisplayPaused(_INTL("{1} gained a boosted {2} Exp. Points!",thispoke.name,exp))
         else
           pbDisplayPaused(_INTL("{1} gained {2} Exp. Points!",thispoke.name,exp))
-        end
-      end
-      # Gain effort value points, using RS effort values
-      totalev=0
-      for k in 0...6
-        totalev+=thispoke.ev[k]
-      end
-      for k in 0...6
-        evgain=evyield[k]
-        evgain*=2 if isConst?(thispoke.item,PBItems,:MACHOBRACE) ||
-                     isConst?(thispoke.itemInitial,PBItems,:MACHOBRACE)
-        case k
-        when PBStats::HP
-          evgain+=4 if isConst?(thispoke.item,PBItems,:POWERWEIGHT) ||
-                       isConst?(thispoke.itemInitial,PBItems,:POWERWEIGHT)
-        when PBStats::ATTACK
-          evgain+=4 if isConst?(thispoke.item,PBItems,:POWERBRACER) ||
-                       isConst?(thispoke.itemInitial,PBItems,:POWERBRACER)
-        when PBStats::DEFENSE
-          evgain+=4 if isConst?(thispoke.item,PBItems,:POWERBELT) ||
-                       isConst?(thispoke.itemInitial,PBItems,:POWERBELT)
-        when PBStats::SPATK
-          evgain+=4 if isConst?(thispoke.item,PBItems,:POWERLENS) ||
-                       isConst?(thispoke.itemInitial,PBItems,:POWERLENS)
-        when PBStats::SPDEF
-          evgain+=4 if isConst?(thispoke.item,PBItems,:POWERBAND) ||
-                       isConst?(thispoke.itemInitial,PBItems,:POWERBAND)
-        when PBStats::SPEED
-          evgain+=4 if isConst?(thispoke.item,PBItems,:POWERANKLET) ||
-                       isConst?(thispoke.itemInitial,PBItems,:POWERANKLET)
-        end
-        evgain*=2 if thispoke.pokerusStage>=1 # Infected or cured
-        if evgain>0
-          # Can't exceed overall limit
-          evgain-=totalev+evgain-PokeBattle_Pokemon::EVLIMIT if totalev+evgain>PokeBattle_Pokemon::EVLIMIT
-          # Can't exceed stat limit
-          evgain-=thispoke.ev[k]+evgain-PokeBattle_Pokemon::EVSTATLIMIT if thispoke.ev[k]+evgain>PokeBattle_Pokemon::EVSTATLIMIT
-          # Add EV gain
-          thispoke.ev[k]+=evgain
-          if thispoke.ev[k]>PokeBattle_Pokemon::EVSTATLIMIT
-            print "Single-stat EV limit #{PokeBattle_Pokemon::EVSTATLIMIT} exceeded.\r\nStat: #{k}  EV gain: #{evgain}  EVs: #{thispoke.ev.inspect}"
-            thispoke.ev[k]=PokeBattle_Pokemon::EVSTATLIMIT
-          end
-          totalev+=evgain
-          if totalev>PokeBattle_Pokemon::EVLIMIT
-            print "EV limit #{PokeBattle_Pokemon::EVLIMIT} exceeded.\r\nTotal EVs: #{totalev} EV gain: #{evgain}  EVs: #{thispoke.ev.inspect}"
-          end
         end
       end
       newlevel=PBExperience.pbGetLevelFromExperience(newexp,growthrate)
@@ -2245,11 +2179,11 @@ class PokeBattle_Battle
       if pkmn.pbOwnSide.effects[PBEffects::StealthRock] && !pkmn.isFainted?
         if !pkmn.hasWorkingAbility(:MAGICGUARD)
           atype=getConst(PBTypes,:ROCK) || 0
-          eff=PBTypes.getCombinedEffectiveness(atype,pkmn.type1,pkmn.type2)
+          eff=PBTypes.getCombinedEffectiveness(atype,pkmn.type1,pkmn.type2,pkmn.effects[PBEffects::Type3])
           if eff>0
             PBDebug.log("[Entry hazard] #{pkmn.pbThis} triggered Stealth Rock")
             @scene.pbDamageAnimation(pkmn,0)
-            pkmn.pbReduceHP(((pkmn.totalhp*eff)/32).floor)
+            pkmn.pbReduceHP(((pkmn.totalhp*eff)/64).floor)
             pbDisplayPaused(_INTL("Pointed stones dug into {1}!",pkmn.pbThis))
           end
         end
@@ -2265,9 +2199,9 @@ class PokeBattle_Battle
           elsif pkmn.pbCanPoisonSpikes?(moldbreaker)
             PBDebug.log("[Entry hazard] #{pkmn.pbThis} triggered Toxic Spikes")
             if pkmn.pbOwnSide.effects[PBEffects::ToxicSpikes]==2
-              pkmn.pbPoison(nil,_INTL("{1} was badly poisoned by the poison spikes!",i.pbThis,true))
+              pkmn.pbPoison(nil,_INTL("{1} was badly poisoned by the poison spikes!",pkmn.pbThis,true))
             else
-              pkmn.pbPoison(nil,_INTL("{1} was poisoned by the poison spikes!",i.pbThis))
+              pkmn.pbPoison(nil,_INTL("{1} was poisoned by the poison spikes!",pkmn.pbThis))
             end
           end
         end
@@ -2681,6 +2615,7 @@ class PokeBattle_Battle
     @scene.pbBeginCommandPhase
     @scene.pbResetCommandIndices
     for i in 0...4   # Reset choices if commands can be shown
+      @battlers[i].effects[PBEffects::SkipTurn]=false
       if pbCanShowCommands?(i) || @battlers[i].isFainted?
         @choices[i][0]=0
         @choices[i][1]=0
@@ -2693,7 +2628,7 @@ class PokeBattle_Battle
       end
     end
     # Reset choices to perform Mega Evolution if it wasn't done somehow
-    for i in 0..1
+    for i in 0...2
       for j in 0...@megaEvolution[i].length
         @megaEvolution[i][j]=-1 if @megaEvolution[i][j]>=0
       end
@@ -2729,11 +2664,11 @@ class PokeBattle_Battle
                     thismove=@battlers[i].moves[index]
                     target=@battlers[i].pbTarget(thismove)
                     if target==PBTargets::SingleNonUser # single non-user
-                      target=@scene.pbChooseTarget(i)
+                      target=@scene.pbChooseTarget(i,target)
                       next if target<0
                       pbRegisterTarget(i,target)
                     elsif target==PBTargets::UserOrPartner # Acupressure
-                      target=@scene.pbChooseTarget(i)
+                      target=@scene.pbChooseTarget(i,target)
                       next if target<0 || (target&1)==1
                       pbRegisterTarget(i,target)
                     end
@@ -2825,12 +2760,13 @@ class PokeBattle_Battle
     # Mega Evolution
     megaevolved=[]
     for i in priority
-      next if @choices[i.index][0]!=1
-      side=(pbIsOpposing?(i.index)) ? 1 : 0
-      owner=pbGetOwnerIndex(i.index)
-      if @megaEvolution[side][owner]==i.index
-        pbMegaEvolve(i.index)
-        megaevolved.push(i.index)
+      if @choices[i.index][0]==1 && !i.effects[PBEffects::SkipTurn]
+        side=(pbIsOpposing?(i.index)) ? 1 : 0
+        owner=pbGetOwnerIndex(i.index)
+        if @megaEvolution[side][owner]==i.index
+          pbMegaEvolve(i.index)
+          megaevolved.push(i.index)
+        end
       end
     end
     if megaevolved.length>0
@@ -2840,7 +2776,7 @@ class PokeBattle_Battle
     end
     # Call at Pokémon
     for i in priority
-      if @choices[i.index][0]==4
+      if @choices[i.index][0]==4 && !i.effects[PBEffects::SkipTurn]
         pbCall(i.index)
       end
     end
@@ -2848,7 +2784,7 @@ class PokeBattle_Battle
     @switching=true
     switched=[]
     for i in priority
-      if @choices[i.index][0]==2
+      if @choices[i.index][0]==2 && !i.effects[PBEffects::SkipTurn]
         index=@choices[i.index][1] # party position of Pokémon to switch to
         newpokename=index
         if isConst?(pbParty(i.index)[index].ability,PBAbilities,:ILLUSION)
@@ -2900,20 +2836,23 @@ class PokeBattle_Battle
     @switching=false
     # Use items
     for i in priority
-      if pbIsOpposing?(i.index) && @choices[i.index][0]==3
-        pbEnemyUseItem(@choices[i.index][1],i)
-      elsif @choices[i.index][0]==3
-        # Player use item
-        item=@choices[i.index][1]
-        if item>0
-          usetype=$ItemData[item][ITEMBATTLEUSE]
-          if usetype==1 || usetype==3
-            if @choices[i.index][2]>=0
-              pbUseItemOnPokemon(item,@choices[i.index][2],i,@scene)
-            end
-          elsif usetype==2 || usetype==4
-            if !ItemHandlers.hasUseInBattle(item) # Poké Ball/Poké Doll used already
-              pbUseItemOnBattler(item,@choices[i.index][2],i,@scene)
+      if @choices[i.index][0]==3 && !i.effects[PBEffects::SkipTurn]
+        if pbIsOpposing?(i.index)
+          # Opponent use item
+          pbEnemyUseItem(@choices[i.index][1],i)
+        else
+          # Player use item
+          item=@choices[i.index][1]
+          if item>0
+            usetype=$ItemData[item][ITEMBATTLEUSE]
+            if usetype==1 || usetype==3
+              if @choices[i.index][2]>=0
+                pbUseItemOnPokemon(item,@choices[i.index][2],i,@scene)
+              end
+            elsif usetype==2 || usetype==4
+              if !ItemHandlers.hasUseInBattle(item) # Poké Ball/Poké Doll used already
+                pbUseItemOnBattler(item,@choices[i.index][2],i,@scene)
+              end
             end
           end
         end
@@ -2921,6 +2860,7 @@ class PokeBattle_Battle
     end
     # Use attacks
     for i in priority
+      next if i.effects[PBEffects::SkipTurn]
       if pbChoseMoveFunctionCode?(i.index,0x115) # Focus Punch
         pbCommonAnimation("FocusPunch",i,nil)
         pbDisplay(_INTL("{1} is tightening its focus!",i.pbThis))
@@ -2931,7 +2871,7 @@ class PokeBattle_Battle
       advance=false
       for i in priority
         next if !i.effects[PBEffects::MoveNext]
-        next if i.hasMovedThisRound?
+        next if i.hasMovedThisRound? || i.effects[PBEffects::SkipTurn]
         advance=i.pbProcessTurn(@choices[i.index])
         break if advance
       end
@@ -2940,7 +2880,7 @@ class PokeBattle_Battle
       # Regular priority order
       for i in priority
         next if i.effects[PBEffects::Quash]
-        next if i.hasMovedThisRound?
+        next if i.hasMovedThisRound? || i.effects[PBEffects::SkipTurn]
         advance=i.pbProcessTurn(@choices[i.index])
         break if advance
       end
@@ -2949,7 +2889,7 @@ class PokeBattle_Battle
       # Quashed
       for i in priority
         next if !i.effects[PBEffects::Quash]
-        next if i.hasMovedThisRound?
+        next if i.hasMovedThisRound? || i.effects[PBEffects::SkipTurn]
         advance=i.pbProcessTurn(@choices[i.index])
         break if advance
       end
@@ -2957,7 +2897,8 @@ class PokeBattle_Battle
       next if advance
       # Check for all done
       for i in priority
-        advance=true if @choices[i.index][0]==1 && !i.hasMovedThisRound?
+        advance=true if @choices[i.index][0]==1 && !i.hasMovedThisRound? &&
+                        !i.effects[PBEffects::SkipTurn]
         break if advance
       end
       next if advance
@@ -2972,18 +2913,19 @@ class PokeBattle_Battle
   def pbEndOfRoundPhase
     PBDebug.log("[End of round]")
     for i in 0...4
-      @battlers[i].effects[PBEffects::Roost]=false
+      @battlers[i].effects[PBEffects::Electrify]=false
+      @battlers[i].effects[PBEffects::Endure]=false
+      @battlers[i].effects[PBEffects::FirstPledge]=0
+      @battlers[i].effects[PBEffects::HyperBeam]-=1 if @battlers[i].effects[PBEffects::HyperBeam]>0
+      @battlers[i].effects[PBEffects::KingsShield]=false
+      @battlers[i].effects[PBEffects::LifeOrb]=false
+      @battlers[i].effects[PBEffects::MoveNext]=false
+      @battlers[i].effects[PBEffects::Powder]=false
       @battlers[i].effects[PBEffects::Protect]=false
       @battlers[i].effects[PBEffects::ProtectNegation]=false
-      @battlers[i].effects[PBEffects::KingsShield]=false
-      @battlers[i].effects[PBEffects::SpikyShield]=false
-      @battlers[i].effects[PBEffects::Endure]=false
-      @battlers[i].effects[PBEffects::HyperBeam]-=1 if @battlers[i].effects[PBEffects::HyperBeam]>0
-      @battlers[i].effects[PBEffects::Electrify]=false
-      @battlers[i].effects[PBEffects::MoveNext]=false
       @battlers[i].effects[PBEffects::Quash]=false
-      @battlers[i].effects[PBEffects::Powder]=false
-      @battlers[i].effects[PBEffects::FirstPledge]=0
+      @battlers[i].effects[PBEffects::Roost]=false
+      @battlers[i].effects[PBEffects::SpikyShield]=false
     end
     @usepriority=false  # recalculate priority
     priority=pbPriority(true) # Ignoring Quick Claw here
@@ -3020,7 +2962,7 @@ class PokeBattle_Battle
         PBDebug.log("[End of effect] Rain weather ended")
       else
         pbCommonAnimation("Rain",nil,nil)
-#        pbDisplay(_INTL("Rain continues to fall."));
+#        pbDisplay(_INTL("Rain continues to fall."))
       end
     when PBWeather::SANDSTORM
       @weatherduration=@weatherduration-1 if @weatherduration>0
@@ -3607,7 +3549,7 @@ class PokeBattle_Battle
       next if i.isFainted?
       if i.effects[PBEffects::PerishSong]>0
         i.effects[PBEffects::PerishSong]-=1
-        pbDisplay(_INTL("{1}'s Perish count fell to {2}!",i.pbThis,i.effects[PBEffects::PerishSong]))
+        pbDisplay(_INTL("{1}'s perish count fell to {2}!",i.pbThis,i.effects[PBEffects::PerishSong]))
         PBDebug.log("[Lingering effect triggered] #{i.pbThis}'s Perish Song count dropped to #{i.effects[PBEffects::PerishSong]}")
         if i.effects[PBEffects::PerishSong]==0
           perishSongUsers.push(i.effects[PBEffects::PerishSongUser])
